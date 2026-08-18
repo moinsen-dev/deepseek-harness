@@ -18,8 +18,9 @@ Phase-0 PoC 以新的 `packages/game/` 组发布，由 `examples/gamedev-agent` 
 - [`@deepseek-ai/dsh-tool-game`](../../../../packages/game/tool-game/README.md) 是消费方：面向模型的 `game_play`（脚本化输入进，步数/状态/分数/终态出，带协作式超时）与 `game_list`。
 - [`@deepseek-ai/dsh-game-gauntlet`](../../../../packages/game/game-gauntlet/README.md) 拥有 gauntlet 循环原语：`ctx.gauntlet.run(scenario, session, attempt)` 经接缝游玩，仅当 `score >= bar` 时判定回合通过（模型无关），强制回合号按会话与场景严格递增，并追加 log-only 的 `gauntlet/round` 会话事件。`nextAttempt` 暴露分配的回合编号，`runLoop(session, plan)` 随包发布 builder/critic 循环策略——候选输入序列逐轮打分、最佳分数作为基线传递、在首个达标回合停止——`foldGauntletRounds` 从日志恢复循环位置。包级不变量在追加处拦截，拒绝判定与门槛关系矛盾的回合。
 - [`@deepseek-ai/dsh-tool-gauntlet`](../../../../packages/game/tool-gauntlet/README.md) 是面向模型的一半：`gauntlet_round` 提出一个候选策略，收到运行时分配的回合号与模型无关判定，因此模型按“提出 → 打分 → 提出”迭代，而无需自己指定回合号。
+- [`@deepseek-ai/dsh-tool-game-build`](../../../../packages/game/tool-game-build/README.md) 是创作的一半：`game_build` 在 `node:vm` 沙箱中编译纯 JavaScript 游戏源码，校验模块契约，通过把探针输入游玩两次来证明确定性，并实时注册游戏；`game_remove` 卸载构建，重建已有 id 会替换上一次构建。循环就此完整：创作 → 试玩 → 门槛 → 重建。
 
-agent 侧的 builder/critic 迭代刻意不作为新引擎发布：它由既有原语组合而成（goal 回合、Ralph 循环、workflow 工具），示例驱动演示了三种形态——两轮脚本化回合（未达标、随后达标）、一次 builder/critic 循环（三个候选、第三个达标）后再跟一次模型驱动的 `gauntlet_round`，以及一次 Ralph 循环——两个全新子代理为 `gold-run` 的 gauntlet 回合打分直至达标（第 1 轮踩雷、第 2 轮走无雷路径完成）。无密钥快照固定三种组装后的转录，真实模型冒烟测试验证事件流中的带分工具结果，而非模型的自我陈述。
+agent 侧的 builder/critic 迭代刻意不作为新引擎发布：它由既有原语组合而成（goal 回合、Ralph 循环、workflow 工具），示例驱动演示了三种形态——两轮脚本化回合（未达标、随后达标）、一次 builder/critic 循环（三个候选、第三个达标）后再跟一次模型驱动的 `gauntlet_round`，以及一次 Ralph 循环——两个全新子代理为 `gold-run` 的 gauntlet 回合打分直至达标（第 1 轮踩雷、第 2 轮走无雷路径完成），和一次创作运行——用 `game_build` 构建全新 counter 游戏、用 `game_play` 游玩并报告循环。无密钥快照固定四种组装后的转录，真实模型冒烟测试验证事件流中的带分工具结果，而非模型的自我陈述。
 
 ## Alternatives considered
 

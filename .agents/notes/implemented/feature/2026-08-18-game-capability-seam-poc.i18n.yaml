@@ -2,5 +2,5 @@
 # side as of the last confirmed-consistent state. Both languages carry equal authority;
 # after editing either side, bring the other along and re-record with:
 #   pnpm run verify-translation-pairing --write .agents/notes/implemented/feature/2026-08-18-game-capability-seam-poc.md
-2026-08-18-game-capability-seam-poc.md: cbf54c8b9e41b86c3b73c5b8a86ef6a9b9a31027
-2026-08-18-game-capability-seam-poc.zh.md: 29305d30974a63848e865c3d40fa97274ceab097
+2026-08-18-game-capability-seam-poc.md: 838bf580fdb1f23cbce576779ad6ffcc752bcc87
+2026-08-18-game-capability-seam-poc.zh.md: 2cfc688575f5371f008a81dd6f906081924a94be

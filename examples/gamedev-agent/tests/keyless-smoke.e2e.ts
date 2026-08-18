@@ -8,9 +8,11 @@ import type { SessionEvent } from '@deepseek-ai/dsh-session'
 const binScript = fileURLToPath(new URL('./fixtures/gauntlet-driver.ts', import.meta.url))
 const loopBinScript = fileURLToPath(new URL('./fixtures/gauntlet-loop-driver.ts', import.meta.url))
 const ralphBinScript = fileURLToPath(new URL('./fixtures/ralph-driver.ts', import.meta.url))
+const buildBinScript = fileURLToPath(new URL('./fixtures/build-driver.ts', import.meta.url))
 const configPath = fileURLToPath(new URL('./fixtures/cli.cordis.yml', import.meta.url))
 const loopConfigPath = fileURLToPath(new URL('./fixtures/cli-loop.cordis.yml', import.meta.url))
 const ralphConfigPath = fileURLToPath(new URL('./fixtures/ralph.cordis.yml', import.meta.url))
+const buildConfigPath = fileURLToPath(new URL('./fixtures/build.cordis.yml', import.meta.url))
 const tsconfigPath = fileURLToPath(new URL('../../../tsconfig.json', import.meta.url))
 
 describe('gamedev-agent keyless smoke', () => {
@@ -98,5 +100,31 @@ describe('gamedev-agent keyless smoke', () => {
     expect(output).toContain('gauntlet_round scored 30 against bar 20')
     expect(persisted.length).toBeGreaterThan(0)
     expect(result).toMatchObject({ type: 'result' })
+  }, LOADER_SMOKE_TEST_TIMEOUT_MS)
+
+  it('builds a brand-new game, plays it, and reports the loop', async () => {
+    const { stdout, stderr } = await runLoaderSmoke({
+      label: 'gamedev-agent build',
+      tempDirPrefix: 'gamedev-agent-build-smoke-',
+      binScript: buildBinScript,
+      libBinScript: buildBinScript,
+      configPath: buildConfigPath,
+      binArgs: [buildConfigPath, 'build a small counter game and play it'],
+      tsconfigPath,
+    })
+    const lines = stdout.trimEnd().split('\n').map(line => JSON.parse(line) as Record<string, unknown>)
+    const events = lines.slice(0, -1).map(line => line['event'] as SessionEvent)
+    const result = lines.at(-1)
+    expect(stderr).toBe('')
+
+    expect(events.filter(event => event.type === 'tool/call' && event.data.name === 'game_build')).toHaveLength(1)
+    expect(events.filter(event => event.type === 'tool/call' && event.data.name === 'game_play').some(
+      event => JSON.stringify(event.data).includes('counter'),
+    )).toBe(true)
+    expect(events.filter(event => event.type === 'tool/result').some(
+      event => JSON.stringify(event).includes('score 3'),
+    )).toBe(true)
+    expect(result).toMatchObject({ type: 'result' })
+    expect(String(result?.['output'])).toContain('GAMEDEV build loop complete')
   }, LOADER_SMOKE_TEST_TIMEOUT_MS)
 })

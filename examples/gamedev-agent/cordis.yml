@@ -64,6 +64,11 @@
 - id: tool-game
   name: '@deepseek-ai/dsh-tool-game'
 
+# The model authors new games through game_build/game_remove: plain-JavaScript
+# sources, vm-sandboxed, determinism-proven, registered live.
+- id: tool-game-build
+  name: '@deepseek-ai/dsh-tool-game-build'
+
 # The model drives gauntlet rounds through gauntlet_round; the runtime assigns
 # strictly increasing attempts and logs every round.
 - id: tool-gauntlet

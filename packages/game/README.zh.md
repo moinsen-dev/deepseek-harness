@@ -12,5 +12,6 @@
 | [`tool-game/`](tool-game/README.md) | 向模型暴露 `game_play` 与 `game_list` | registers on `ctx.tools` |
 | [`game-gauntlet/`](game-gauntlet/README.md) | 对照质量门槛给回合打分、运行 builder/critic 循环策略并记录持久化 `gauntlet/round` 会话事件 | `ctx.gauntlet` |
 | [`tool-gauntlet/`](tool-gauntlet/README.md) | 向模型暴露 `gauntlet_round`，回合号由运行时分配 | registers on `ctx.tools` |
+| [`tool-game-build/`](tool-game-build/README.md) | 创作新游戏：编译沙箱源码、证明确定性、实时注册 | registers on `ctx.tools` |
 
 把这些组件变成可玩循环的演示组合见 [examples/gamedev-agent](../../examples/gamedev-agent/README.md)；循环的 builder/critic 迭代由 goal、Ralph 与 workflow 原语组合而成，不随本家族发布。

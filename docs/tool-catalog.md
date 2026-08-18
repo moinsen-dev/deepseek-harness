@@ -41,6 +41,7 @@ This table connects model-visible tool names to the plugin package and service s
 | `@deepseek-ai/dsh-tool-web` | `web_fetch`, `web_search` | `ctx.tools`, `ctx.web`, `ctx.systemPrompt` | `tool/call`, `tool/result` | - | web_search and web_fetch keep provider selection behind ctx.web so model-visible schemas stay stable across backend swaps. |
 | `@deepseek-ai/dsh-tool-game` | `game_list`, `game_play` | `ctx.tools`, `ctx.game` | `tool/call`, `tool/result` | - | game_play and game_list keep game selection behind ctx.game so model-visible schemas stay stable across provider swaps. |
 | `@deepseek-ai/dsh-tool-gauntlet` | `gauntlet_round` | `ctx.tools`, `ctx.gauntlet` | `tool/call`, `gauntlet/round`, `tool/result` | - | gauntlet_round keeps scoring behind ctx.gauntlet so model-visible schemas stay stable across game providers. |
+| `@deepseek-ai/dsh-tool-game-build` | `game_build`, `game_remove` | `ctx.tools`, `ctx.game` | `tool/call`, `tool/result` | - | game_build and game_remove keep registration behind ctx.game so model-visible schemas stay stable across game providers. |
 
 <a id="deepseek-aidsh-tool-ask-user"></a>
 
@@ -1970,3 +1971,56 @@ Play one gauntlet round: propose a candidate input sequence for a registered gam
 Source: [`packages/game/tool-gauntlet/src/index.ts`](../packages/game/tool-gauntlet/src/index.ts)
 
 gauntlet_round keeps scoring behind ctx.gauntlet so model-visible schemas stay stable across game providers.
+
+<a id="deepseek-aidsh-tool-game-build"></a>
+
+## `@deepseek-ai/dsh-tool-game-build`
+
+### `game_build`
+
+Build a new game from plain JavaScript source and register it live: the source must set module.exports.create to a factory returning { step(input), state(), done(), score() }. The tool compiles it in a sandbox, proves determinism by playing the probe inputs twice (both runs must agree after every input), and reports the probe outcome. Rebuilding an existing id replaces the previous build.
+
+```json
+{
+  "type": "object",
+  "properties": {
+    "id": {
+      "type": "string",
+      "description": "Stable game id for the new game; rebuilding it replaces the previous build."
+    },
+    "source": {
+      "type": "string",
+      "description": "Plain JavaScript module body setting module.exports.create; no TypeScript annotations."
+    }
+  },
+  "required": [
+    "id",
+    "source"
+  ]
+}
+```
+
+Source: [`packages/game/tool-game-build/src/index.ts`](../packages/game/tool-game-build/src/index.ts)
+
+### `game_remove`
+
+Unload a game that game_build registered. Built-in games and games from other providers are not removable.
+
+```json
+{
+  "type": "object",
+  "properties": {
+    "id": {
+      "type": "string",
+      "description": "Stable game id of a game this session built with game_build."
+    }
+  },
+  "required": [
+    "id"
+  ]
+}
+```
+
+Source: [`packages/game/tool-game-build/src/index.ts`](../packages/game/tool-game-build/src/index.ts)
+
+game_build and game_remove keep registration behind ctx.game so model-visible schemas stay stable across game providers.

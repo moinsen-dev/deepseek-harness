@@ -2,7 +2,7 @@
 
 [English](game.md) | 中文
 
-游戏能力——一条[能力接缝](../../.agents/notes/implemented/feature/2026-08-18-game-capability-seam-poc.md)，横跨确定性游戏模块、其面向模型的游玩工具，以及把回合对照质量门槛打分的 gauntlet 循环。Service Definition（[dsh-game](../../packages/game/game)，`ctx.game` + 模块注册表与试玩执行）、Service Providers（[dsh-game-sim](../../packages/game/game-sim)，`coin-chase` 模拟；[dsh-engine-godot](../../packages/game/engine-godot)，加载期 Godot-headless 追踪以同步模块重放）与 Consumers（[dsh-tool-game](../../packages/game/tool-game)，`game_play`/`game_list` 工具；[dsh-game-gauntlet](../../packages/game/game-gauntlet)，`ctx.gauntlet` + `gauntlet/round` 会话事件）。游戏是**一项可选能力**，不属于 agent-loop 主干。更换提供方不改变模型请求游玩的方式，更换场景不改变回合打分的方式。
+游戏能力——一条[能力接缝](../../.agents/notes/implemented/feature/2026-08-18-game-capability-seam-poc.md)，横跨确定性游戏模块、其面向模型的游玩工具，以及把回合对照质量门槛打分的 gauntlet 循环。Service Definition（[dsh-game](../../packages/game/game)，`ctx.game` + 模块注册表与试玩执行）、Service Providers（[dsh-game-sim](../../packages/game/game-sim)，`coin-chase` 模拟；[dsh-engine-godot](../../packages/game/engine-godot)，加载期 Godot-headless 追踪以同步模块重放）与 Consumers（[dsh-tool-game](../../packages/game/tool-game)，`game_play`/`game_list` 工具；[dsh-tool-gauntlet](../../packages/game/tool-gauntlet)，`gauntlet_round` 工具；[dsh-tool-game-build](../../packages/game/tool-game-build)，`game_build`/`game_remove` 创作工具；[dsh-game-gauntlet](../../packages/game/game-gauntlet)，`ctx.gauntlet` + `gauntlet/round` 会话事件）。游戏是**一项可选能力**，不属于 agent-loop 主干。更换提供方不改变模型请求游玩的方式，更换场景不改变回合打分的方式。
 
 Source: [`packages/game/game/src/types.ts`](../../packages/game/game/src/types.ts)
 

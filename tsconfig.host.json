@@ -235,6 +235,7 @@
     { "path": "./packages/game/game-sim" },
     { "path": "./packages/game/tool-game" },
     { "path": "./packages/game/tool-gauntlet" },
+    { "path": "./packages/game/tool-game-build" },
     { "path": "./packages/game/engine-godot" },
     { "path": "./packages/game/game-gauntlet" },
     { "path": "./packages/spill/spill" },
