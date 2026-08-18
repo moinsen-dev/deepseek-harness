@@ -92,7 +92,7 @@ describe('tool-game real Loader composition through cordis.yml', () => {
     const ctx = await boot()
     const names = ctx.tools.schemas().map(schema => schema.name)
     expect(names).toEqual(expect.arrayContaining(['game_play', 'game_list']))
-    expect(ctx.game.list().map(module => module.id)).toEqual(['coin-chase'])
+    expect(ctx.game.list().map(module => module.id)).toEqual(['coin-chase', 'gold-run'])
 
     const owner = agent(ctx)
     const result = await ctx.tools.execute({

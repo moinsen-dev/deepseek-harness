@@ -11,10 +11,14 @@ const scenarioDir = join(snapshotsDir, 'gauntlet-loop')
 const streamExpected = join(scenarioDir, 'stream-json.expected.jsonl')
 const loopScenarioDir = join(snapshotsDir, 'builder-critic-loop')
 const loopStreamExpected = join(loopScenarioDir, 'stream-json.expected.jsonl')
+const ralphScenarioDir = join(snapshotsDir, 'ralph-loop')
+const ralphStreamExpected = join(ralphScenarioDir, 'stream-json.expected.jsonl')
 const binScript = fileURLToPath(new URL('./fixtures/gauntlet-driver.ts', import.meta.url))
 const loopBinScript = fileURLToPath(new URL('./fixtures/gauntlet-loop-driver.ts', import.meta.url))
+const ralphBinScript = fileURLToPath(new URL('./fixtures/ralph-driver.ts', import.meta.url))
 const configPath = fileURLToPath(new URL('./fixtures/cli.cordis.yml', import.meta.url))
 const loopConfigPath = fileURLToPath(new URL('./fixtures/cli-loop.cordis.yml', import.meta.url))
+const ralphConfigPath = fileURLToPath(new URL('./fixtures/ralph.cordis.yml', import.meta.url))
 const tsconfigPath = fileURLToPath(new URL('../../../tsconfig.json', import.meta.url))
 const refreshing = process.env.DSH_SNAPSHOT === 'refresh'
 
@@ -109,5 +113,32 @@ describe('gamedev-agent keyless snapshot', () => {
       await writeFile(loopStreamExpected, normalized)
     }
     expect(normalized).toBe(await readFile(loopStreamExpected, 'utf8'))
+  }, LOADER_SMOKE_TEST_TIMEOUT_MS)
+
+  it('pins the Ralph builder/critic loop — two fresh children until the bar passes', async () => {
+    let runCwd = ''
+    const result = await runLoaderSmoke({
+      label: 'gamedev-agent ralph loop stream-json snapshot',
+      tempDirPrefix: 'gamedev-agent-ralph-snapshot-',
+      binScript: ralphBinScript,
+      libBinScript: ralphBinScript,
+      configPath: ralphConfigPath,
+      binArgs: [ralphConfigPath, 'run a ralph loop to reach the gold-run bar'],
+      tsconfigPath,
+      processTimeoutMs: 60_000,
+      env: {
+        DSH_SNAPSHOT: 'replay',
+        NODE_OPTIONS: [process.env.NODE_OPTIONS, '--disable-warning=ExperimentalWarning'].filter(Boolean).join(' '),
+      },
+      prepare: (cwd) => { runCwd = cwd },
+    })
+
+    expect(result.stderr).toBe('')
+    const normalized = normalizeHeadlessStream(result.stdout, runCwd)
+    if (refreshing) {
+      await mkdir(ralphScenarioDir, { recursive: true })
+      await writeFile(ralphStreamExpected, normalized)
+    }
+    expect(normalized).toBe(await readFile(ralphStreamExpected, 'utf8'))
   }, LOADER_SMOKE_TEST_TIMEOUT_MS)
 })

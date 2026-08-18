@@ -13,13 +13,13 @@ DeepSeek Harness 是基于插件的 Harness，但已发布代码树中没有任�
 Phase-0 PoC 以新的 `packages/game/` 组发布，由 `examples/gamedev-agent` 演示：
 
 - [`@deepseek-ai/dsh-game`](../../../../packages/game/game/README.md) 是 Service Definition：`ctx.game` 按稳定 id 注册确定性 `GameModule`（重复 id 大声失败），以配置的 `maxSteps` 上限执行脚本化输入序列，并把每个状态快照校验为无损 JSON、最终分数校验为有限值。接缝不依赖会话：记录什么由消费方决定。
-- [`@deepseek-ai/dsh-game-sim`](../../../../packages/game/game-sim/README.md) 是第一个提供方：`coin-chase` 3x3 确定性模拟（四种移动、三枚固定金币、每枚 10 分、全部收齐即结束）。
+- [`@deepseek-ai/dsh-game-sim`](../../../../packages/game/game-sim/README.md) 是第一个提供方：`coin-chase` 3x3 确定性模拟（四种移动、三枚固定金币、每枚 10 分、全部收齐即结束）与 `gold-run`——5x5 网格中的两枚地雷会结束运行，更大的无雷搜索空间让 builder 的首个候选通常错过门槛，迭代带来可见提升。
 - [`@deepseek-ai/dsh-engine-godot`](../../../../packages/game/engine-godot/README.md) 是引擎提供方：每个已配置场景在加载时经 Godot headless 运行一次，校验后的确定性 NDJSON 追踪以同步重放模块注册——真实引擎结果进入同一接缝，每步实时引擎执行仍待做。
 - [`@deepseek-ai/dsh-tool-game`](../../../../packages/game/tool-game/README.md) 是消费方：面向模型的 `game_play`（脚本化输入进，步数/状态/分数/终态出，带协作式超时）与 `game_list`。
 - [`@deepseek-ai/dsh-game-gauntlet`](../../../../packages/game/game-gauntlet/README.md) 拥有 gauntlet 循环原语：`ctx.gauntlet.run(scenario, session, attempt)` 经接缝游玩，仅当 `score >= bar` 时判定回合通过（模型无关），强制回合号按会话与场景严格递增，并追加 log-only 的 `gauntlet/round` 会话事件。`nextAttempt` 暴露分配的回合编号，`runLoop(session, plan)` 随包发布 builder/critic 循环策略——候选输入序列逐轮打分、最佳分数作为基线传递、在首个达标回合停止——`foldGauntletRounds` 从日志恢复循环位置。包级不变量在追加处拦截，拒绝判定与门槛关系矛盾的回合。
 - [`@deepseek-ai/dsh-tool-gauntlet`](../../../../packages/game/tool-gauntlet/README.md) 是面向模型的一半：`gauntlet_round` 提出一个候选策略，收到运行时分配的回合号与模型无关判定，因此模型按“提出 → 打分 → 提出”迭代，而无需自己指定回合号。
 
-agent 侧的 builder/critic 迭代刻意不作为新引擎发布：它由既有原语组合而成（goal 回合、Ralph 循环、workflow 工具），示例驱动演示了两种形态——两轮脚本化回合（未达标、随后达标）与一次 builder/critic 循环（三个候选、第三个达标）后再跟一次模型驱动的 `gauntlet_round`。无密钥快照固定两种组装后的转录，真实模型冒烟测试验证事件流中的带分工具结果，而非模型的自我陈述。
+agent 侧的 builder/critic 迭代刻意不作为新引擎发布：它由既有原语组合而成（goal 回合、Ralph 循环、workflow 工具），示例驱动演示了三种形态——两轮脚本化回合（未达标、随后达标）、一次 builder/critic 循环（三个候选、第三个达标）后再跟一次模型驱动的 `gauntlet_round`，以及一次 Ralph 循环——两个全新子代理为 `gold-run` 的 gauntlet 回合打分直至达标（第 1 轮踩雷、第 2 轮走无雷路径完成）。无密钥快照固定三种组装后的转录，真实模型冒烟测试验证事件流中的带分工具结果，而非模型的自我陈述。
 
 ## Alternatives considered
 

@@ -119,7 +119,7 @@ describe('game tools execution', () => {
       agent,
     })
     expect(result.isError).toBe(false)
-    expect(resultText(result)).toBe('Registered games:\n- coin-chase')
+    expect(resultText(result)).toBe('Registered games:\n- coin-chase\n- gold-run')
   })
 
   it('game_play runs a winning sequence and renders the score', async () => {
