@@ -69,6 +69,8 @@ export const SERVICE_PAGE: Record<string, string> = {
   dynamicCordisRunner: 'extensions.md',
   e2b: 'subprocess.md',
   fs: 'filesystem.md',
+  game: 'game.md',
+  gauntlet: 'game.md',
   goals: 'goal.md',
   webServer: 'web-server.md',
   invariants: 'invariants.md',
@@ -506,6 +508,14 @@ export const FOUNDATION_TYPE_NAMES: ReadonlySet<string> = new Set([
 /** Project types deliberately documented outside the subsystems catalog. */
 export const TYPE_LINK_EXEMPTIONS: Readonly<Record<string, string>> = {
   z: 'schemastery schema constructor is owned by vendor/schemastery (vendored upstream)',
+  GameModule: 'game module contract is owned by packages/game/game/README.md',
+  GameInstance: 'game instance contract is owned by packages/game/game/README.md',
+  PlaytestRequest: 'playtest request contract is owned by packages/game/game/README.md',
+  PlaytestResult: 'playtest result contract is owned by packages/game/game/README.md',
+  GauntletRound: 'gauntlet round contract is owned by packages/game/game-gauntlet/README.md',
+  GauntletScenario: 'gauntlet scenario contract is owned by packages/game/game-gauntlet/README.md',
+  GauntletLoopPlan: 'gauntlet loop plan contract is owned by packages/game/game-gauntlet/README.md',
+  GauntletLoopResult: 'gauntlet loop result contract is owned by packages/game/game-gauntlet/README.md',
   BeginCommandRequest: 'event-local request contract is owned by packages/client/ui-input-trigger/src/types.ts',
   InsertReferenceRequest: 'event-local request contract is owned by packages/client/ui-input-trigger/src/types.ts',
   ConsumeTokenRequest: 'event-local request contract is owned by packages/client/ui-input-trigger/src/types.ts',

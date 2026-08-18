@@ -585,6 +585,40 @@ export interface Config {
 
 Source: [`packages/e2b/e2b/src/index.ts:43`](../packages/e2b/e2b/src/index.ts)
 
+<a id="deepseek-aidsh-engine-godot"></a>
+
+## `@deepseek-ai/dsh-engine-godot`
+
+Requires: `game` · `subprocess`
+
+```ts config-catalog
+/** Plugin config: the engine executable, the grace period, and the scenarios to trace. */
+export interface Config {
+  /** Godot executable. Defaults to `godot` on PATH. */
+  godotPath?: string
+  /** Terminate-escalation grace (ms) for one engine run. Defaults to 30000. */
+  graceMs?: number
+  /** Engine scenarios to trace and register; an empty list registers nothing. */
+  scenarios?: GodotScenario[]
+}
+
+/** One engine scenario the provider turns into a registered game module. */
+export interface GodotScenario {
+  /** Stable game id the produced module registers under. */
+  readonly id: string
+  /** Godot project directory (`--path`). */
+  readonly projectDir: string
+  /** Runner script inside the project (`--script`, e.g. `res://runner.gd`). */
+  readonly runner: string
+  /** The fixed scripted input sequence the runner replays. */
+  readonly inputs: JsonValue[]
+}
+```
+
+Depends on: [`JsonValue`](../packages/core/session/src/index.ts)
+
+Source: [`packages/game/engine-godot/src/index.ts:35`](../packages/game/engine-godot/src/index.ts)
+
 <a id="deepseek-aidsh-fs-local"></a>
 
 ## `@deepseek-ai/dsh-fs-local`
@@ -623,6 +657,20 @@ export type Config = LocalConfig
 Depends on: [`LocalConfig`](#deepseek-aidsh-fs-local)
 
 Source: [`packages/fs/fs-sandbox/src/index.ts:49`](../packages/fs/fs-sandbox/src/index.ts)
+
+<a id="deepseek-aidsh-game"></a>
+
+## `@deepseek-ai/dsh-game`
+
+```ts config-catalog
+/** Config for the game seam: the per-run input cap enforced during play. */
+export interface GameRuntimeConfig {
+  /** Maximum number of inputs one playtest run may apply. */
+  readonly maxSteps?: number
+}
+```
+
+Source: [`packages/game/game/src/index.ts:28`](../packages/game/game/src/index.ts)
 
 <a id="deepseek-aidsh-goal"></a>
 
@@ -2429,6 +2477,44 @@ export interface Config {
 
 Source: [`packages/fs/tool-fs-search/src/index.ts:73`](../packages/fs/tool-fs-search/src/index.ts)
 
+<a id="deepseek-aidsh-tool-game"></a>
+
+## `@deepseek-ai/dsh-tool-game`
+
+Requires: `tools` · `game`
+
+```ts config-catalog
+/** Plugin config: which game tools to register and the `game_play` timeout budget. */
+export interface Config {
+  /** Register `game_play`. Defaults to true. */
+  play?: boolean
+  /** Register `game_list`. Defaults to true. */
+  list?: boolean
+  /** Cooperative timeout budget (ms) for `game_play`. Defaults to 30000. */
+  playTimeoutMs?: number
+}
+```
+
+Source: [`packages/game/tool-game/src/index.ts:31`](../packages/game/tool-game/src/index.ts)
+
+<a id="deepseek-aidsh-tool-gauntlet"></a>
+
+## `@deepseek-ai/dsh-tool-gauntlet`
+
+Requires: `tools` · `gauntlet`
+
+```ts config-catalog
+/** Plugin config: tool enablement and the `gauntlet_round` timeout budget. */
+export interface Config {
+  /** Register `gauntlet_round`. Defaults to true. */
+  enabled?: boolean
+  /** Cooperative timeout budget (ms) for `gauntlet_round`. Defaults to 30000. */
+  timeoutMs?: number
+}
+```
+
+Source: [`packages/game/tool-gauntlet/src/index.ts:26`](../packages/game/tool-gauntlet/src/index.ts)
+
 <a id="deepseek-aidsh-tool-goal"></a>
 
 ## `@deepseek-ai/dsh-tool-goal`
@@ -3067,6 +3153,8 @@ These load from a `cordis.yml` entry with no `config:` block; they declare no co
 - `@deepseek-ai/dsh-cordis-client-runner` ([`packages/extensions/cordis-client-runner/src/index.ts`](../packages/extensions/cordis-client-runner/src/index.ts))
 - `@deepseek-ai/dsh-fs-e2b` — requires `e2b` ([`packages/e2b/fs-e2b/src/index.ts`](../packages/e2b/fs-e2b/src/index.ts))
 - `@deepseek-ai/dsh-fs-observation-policy` ([`packages/fs/fs-observation-policy/src/index.ts`](../packages/fs/fs-observation-policy/src/index.ts))
+- `@deepseek-ai/dsh-game-gauntlet` — requires `game` · `sessions` ([`packages/game/game-gauntlet/src/index.ts`](../packages/game/game-gauntlet/src/index.ts))
+- `@deepseek-ai/dsh-game-sim` — requires `game` ([`packages/game/game-sim/src/index.ts`](../packages/game/game-sim/src/index.ts))
 - `@deepseek-ai/dsh-goal-round-driver` — requires `agents` · `goals` · `sessions` ([`packages/goal/goal-round-driver/src/index.ts`](../packages/goal/goal-round-driver/src/index.ts))
 - `@deepseek-ai/dsh-host-directory-picker-auto` — requires `webServer` · `loader` ([`packages/host/directory-picker-auto/src/index.ts`](../packages/host/directory-picker-auto/src/index.ts))
 - `@deepseek-ai/dsh-host-directory-picker-native` ([`packages/host/directory-picker-native/src/index.ts`](../packages/host/directory-picker-native/src/index.ts))
