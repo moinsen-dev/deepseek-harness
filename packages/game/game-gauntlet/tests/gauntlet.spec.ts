@@ -95,6 +95,83 @@ describe('GauntletRuntime.run', () => {
   })
 })
 
+describe('GauntletRuntime.nextAttempt and runLoop', () => {
+  it('nextAttempt starts at 1 and advances with accepted rounds', async () => {
+    const { ctx } = await mountGauntlet()
+    const session = ctx.sessions.create(SessionId('attempt-count-session'))
+    expect(ctx.gauntlet.nextAttempt(session, 'collect-all')).toBe(1)
+    ctx.gauntlet.run(WINNING_SCENARIO, session, 1)
+    expect(ctx.gauntlet.nextAttempt(session, 'collect-all')).toBe(2)
+    expect(ctx.gauntlet.nextAttempt(session, 'other')).toBe(1)
+  })
+
+  it('runLoop plays candidates until the bar passes, carrying the best score as baseline', async () => {
+    const { ctx } = await mountGauntlet()
+    const session = ctx.sessions.create(SessionId('loop-session'))
+
+    const result = ctx.gauntlet.runLoop(session, {
+      scenarioId: 'collect-all',
+      game: 'coin-chase',
+      bar: 30,
+      candidates: [['up'], ['down', 'right'], WINNING_MOVES],
+    })
+    expect(result).toEqual({ scenarioId: 'collect-all', attempts: 3, best: 30, passed: true, winningAttempt: 3 })
+    const rounds = session.events.filter(event => event.type === 'gauntlet/round').map(event => event.data)
+    expect(rounds).toHaveLength(3)
+    expect(rounds[1]).toMatchObject({ attempt: 2, score: 10, baseline: 0, passed: false })
+    expect(rounds[2]).toMatchObject({ attempt: 3, score: 30, baseline: 10, passed: true })
+  })
+
+  it('runLoop seeds its baseline from the scenario\'s prior logged best', async () => {
+    const { ctx } = await mountGauntlet()
+    const session = ctx.sessions.create(SessionId('loop-resume-session'))
+    ctx.gauntlet.run(WINNING_SCENARIO, session, 1)
+    ctx.gauntlet.run({ ...WINNING_SCENARIO, inputs: ['up'] }, session, 2)
+
+    const result = ctx.gauntlet.runLoop(session, {
+      scenarioId: 'collect-all',
+      game: 'coin-chase',
+      bar: 30,
+      candidates: [['up']],
+    })
+    expect(result).toEqual({ scenarioId: 'collect-all', attempts: 1, best: 30, passed: false })
+    expect(session.events.findLast(event => event.type === 'gauntlet/round')?.data).toMatchObject({ attempt: 3, baseline: 30 })
+  })
+
+  it('runLoop stops at the first passing round', async () => {
+    const { ctx } = await mountGauntlet()
+    const session = ctx.sessions.create(SessionId('loop-early-session'))
+
+    const result = ctx.gauntlet.runLoop(session, {
+      scenarioId: 'collect-all',
+      game: 'coin-chase',
+      bar: 30,
+      candidates: [WINNING_MOVES, ['up']],
+    })
+    expect(result).toEqual({ scenarioId: 'collect-all', attempts: 1, best: 30, passed: true, winningAttempt: 1 })
+    expect(session.events.filter(event => event.type === 'gauntlet/round')).toHaveLength(1)
+  })
+
+  it('runLoop with no candidates starts no rounds', async () => {
+    const { ctx } = await mountGauntlet()
+    const session = ctx.sessions.create(SessionId('loop-empty-session'))
+
+    expect(ctx.gauntlet.runLoop(session, { scenarioId: 'collect-all', game: 'coin-chase', bar: 30, candidates: [] }))
+      .toEqual({ scenarioId: 'collect-all', attempts: 0, passed: false })
+    expect(session.events.some(event => event.type === 'gauntlet/round')).toBe(false)
+  })
+
+  it('runLoop rejects a blank scenario id and a non-finite bar', async () => {
+    const { ctx } = await mountGauntlet()
+    const session = ctx.sessions.create(SessionId('loop-invalid-session'))
+
+    expect(() => ctx.gauntlet.runLoop(session, { scenarioId: '  ', game: 'coin-chase', bar: 30, candidates: [] }))
+      .toThrow(expect.objectContaining({ code: 'GAUNTLET_INVALID_SCENARIO_ID' }))
+    expect(() => ctx.gauntlet.runLoop(session, { scenarioId: 'collect-all', game: 'coin-chase', bar: Number.NaN, candidates: [] }))
+      .toThrow(expect.objectContaining({ code: 'GAUNTLET_INVALID_BAR' }))
+  })
+})
+
 describe('foldGauntletRounds', () => {
   it('folds an empty log to zero attempts with no best', () => {
     expect(foldGauntletRounds([])).toEqual({ attempts: 0, lastPassed: false, best: undefined })
@@ -103,7 +180,9 @@ describe('foldGauntletRounds', () => {
   it('skips non-round events and folds attempts, last verdict, and best score', async () => {
     const { ctx } = await mountGauntlet()
     const session = ctx.sessions.create(SessionId('fold-session'))
+    session.append('turn/start', { turn: 1 })
     ctx.gauntlet.run({ id: 'fold', game: 'coin-chase', inputs: ['up'], bar: 10 }, session, 1)
+    session.append('turn/end', { turn: 1, reason: { kind: 'completed' } })
     ctx.gauntlet.run({ id: 'fold', game: 'coin-chase', inputs: WINNING_MOVES, bar: 30 }, session, 2)
 
     const folded = foldGauntletRounds(session.events)

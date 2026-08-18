@@ -76,7 +76,7 @@ interface PlaytestResult {
 
 ## gauntlet 循环
 
-`ctx.gauntlet.run` 经接缝游玩场景，仅当 `score >= bar` 时判定回合通过（模型无关），强制回合号按会话与场景严格递增，并追加 log-only 的 `gauntlet/round` 会话事件——`scenarioId`、`game`、`attempt`、`steps`、`score`、`bar`、可选 `baseline` 与 `passed`。该事件绝不进入派生历史；恢复与分叉通过折叠日志还原循环位置。
+`ctx.gauntlet.run` 经接缝游玩场景，仅当 `score >= bar` 时判定回合通过（模型无关），强制回合号按会话与场景严格递增，并追加 log-only 的 `gauntlet/round` 会话事件——`scenarioId`、`game`、`attempt`、`steps`、`score`、`bar`、可选 `baseline` 与 `passed`。该事件绝不进入派生历史；恢复与分叉通过折叠日志还原循环位置。builder/critic 循环策略 `runLoop` 依次游玩候选输入序列直至达标，并把迄今最佳分数作为下一轮的基线。
 
 ```ts type-equiv
 /**
@@ -119,6 +119,41 @@ interface GauntletRound {
   readonly passed: boolean
   /** Seq of the appended `gauntlet/round` session event. */
   readonly eventSeq: number
+}
+```
+
+```ts type-equiv
+/**
+ * One builder/critic loop plan: a fixed game and quality bar plus the
+ * candidate input sequences the builder produced. The loop plays each
+ * candidate as one round, carries the best score so far as the next round's
+ * baseline, and stops at the first round that reaches the bar.
+ */
+interface GauntletLoopPlan {
+  /** Stable scenario id shared by every round of this loop. */
+  readonly scenarioId: string
+  /** Registered game id the loop plays. */
+  readonly game: string
+  /** Quality bar: the loop stops once a round reaches this number. */
+  readonly bar: number
+  /** Candidate scripted input sequences, played in order until the bar passes. */
+  readonly candidates: readonly (readonly JsonValue[])[]
+}
+```
+
+```ts type-equiv
+/** Normalized outcome of one completed loop run. */
+interface GauntletLoopResult {
+  /** The scenario's stable id. */
+  readonly scenarioId: string
+  /** Number of rounds the loop started. */
+  readonly attempts: number
+  /** Best score across the started rounds, when any round ran. */
+  readonly best?: number
+  /** Whether a round reached the bar. */
+  readonly passed: boolean
+  /** The attempt that reached the bar, when one exists. */
+  readonly winningAttempt?: number
 }
 ```
 
@@ -187,9 +222,31 @@ The gauntlet runtime. Registered as `ctx.gauntlet` (one instance per context). E
  * @returns the normalized round, including the appended event's seq.
  */
 run(scenario: GauntletScenario, session: Session, attempt: number): GauntletRound
+
+/**
+ * The attempt number the next round for this scenario in this session would
+ * receive — one above the last accepted attempt, or 1 for a new scenario.
+ * @param session - the session whose attempt history is consulted.
+ * @param scenarioId - the scenario's stable id.
+ * @returns the next strictly increasing attempt number.
+ */
+nextAttempt(session: Session, scenarioId: string): number
+
+/**
+ * Run the builder/critic loop policy: play each candidate input sequence as
+ * one round, carrying the best score so far as the next round's baseline,
+ * and stop at the first round that reaches the bar. Model-free and
+ * deterministic; every round lands as a durable `gauntlet/round` event, so
+ * resume and fork recover the loop position by folding the log.
+ * @param session - the session whose log receives the round events.
+ * @param plan - the scenario id, game, bar, and candidate sequences.
+ * @returns the normalized loop outcome; `winningAttempt` names the passing
+ *   round when one exists.
+ */
+runLoop(session: Session, plan: GauntletLoopPlan): GauntletLoopResult
 ```
 
 Types: [Session](session.md)
 
-Source: [`packages/game/game-gauntlet/src/index.ts:32`](../../packages/game/game-gauntlet/src/index.ts)
+Source: [`packages/game/game-gauntlet/src/index.ts:33`](../../packages/game/game-gauntlet/src/index.ts)
 <!-- END GENERATED cordis-surface -->

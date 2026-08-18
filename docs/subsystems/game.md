@@ -76,7 +76,7 @@ interface PlaytestResult {
 
 ## The gauntlet loop
 
-`ctx.gauntlet.run` plays a scenario through the seam, passes the round exactly when `score >= bar` (model-free), enforces strictly increasing attempts per session and scenario, and appends the log-only `gauntlet/round` session event — `scenarioId`, `game`, `attempt`, `steps`, `score`, `bar`, optional `baseline`, and `passed`. The event never joins derived history; resume and fork recover loop position by folding the log.
+`ctx.gauntlet.run` plays a scenario through the seam, passes the round exactly when `score >= bar` (model-free), enforces strictly increasing attempts per session and scenario, and appends the log-only `gauntlet/round` session event — `scenarioId`, `game`, `attempt`, `steps`, `score`, `bar`, optional `baseline`, and `passed`. The event never joins derived history; resume and fork recover loop position by folding the log. The builder/critic loop policy `runLoop` plays candidate input sequences until the bar passes, carrying the best score so far as each next round's baseline.
 
 ```ts type-equiv
 /**
@@ -119,6 +119,41 @@ interface GauntletRound {
   readonly passed: boolean
   /** Seq of the appended `gauntlet/round` session event. */
   readonly eventSeq: number
+}
+```
+
+```ts type-equiv
+/**
+ * One builder/critic loop plan: a fixed game and quality bar plus the
+ * candidate input sequences the builder produced. The loop plays each
+ * candidate as one round, carries the best score so far as the next round's
+ * baseline, and stops at the first round that reaches the bar.
+ */
+interface GauntletLoopPlan {
+  /** Stable scenario id shared by every round of this loop. */
+  readonly scenarioId: string
+  /** Registered game id the loop plays. */
+  readonly game: string
+  /** Quality bar: the loop stops once a round reaches this number. */
+  readonly bar: number
+  /** Candidate scripted input sequences, played in order until the bar passes. */
+  readonly candidates: readonly (readonly JsonValue[])[]
+}
+```
+
+```ts type-equiv
+/** Normalized outcome of one completed loop run. */
+interface GauntletLoopResult {
+  /** The scenario's stable id. */
+  readonly scenarioId: string
+  /** Number of rounds the loop started. */
+  readonly attempts: number
+  /** Best score across the started rounds, when any round ran. */
+  readonly best?: number
+  /** Whether a round reached the bar. */
+  readonly passed: boolean
+  /** The attempt that reached the bar, when one exists. */
+  readonly winningAttempt?: number
 }
 ```
 
@@ -187,9 +222,31 @@ The gauntlet runtime. Registered as `ctx.gauntlet` (one instance per context). E
  * @returns the normalized round, including the appended event's seq.
  */
 run(scenario: GauntletScenario, session: Session, attempt: number): GauntletRound
+
+/**
+ * The attempt number the next round for this scenario in this session would
+ * receive — one above the last accepted attempt, or 1 for a new scenario.
+ * @param session - the session whose attempt history is consulted.
+ * @param scenarioId - the scenario's stable id.
+ * @returns the next strictly increasing attempt number.
+ */
+nextAttempt(session: Session, scenarioId: string): number
+
+/**
+ * Run the builder/critic loop policy: play each candidate input sequence as
+ * one round, carrying the best score so far as the next round's baseline,
+ * and stop at the first round that reaches the bar. Model-free and
+ * deterministic; every round lands as a durable `gauntlet/round` event, so
+ * resume and fork recover the loop position by folding the log.
+ * @param session - the session whose log receives the round events.
+ * @param plan - the scenario id, game, bar, and candidate sequences.
+ * @returns the normalized loop outcome; `winningAttempt` names the passing
+ *   round when one exists.
+ */
+runLoop(session: Session, plan: GauntletLoopPlan): GauntletLoopResult
 ```
 
 Types: [Session](session.md)
 
-Source: [`packages/game/game-gauntlet/src/index.ts:32`](../../packages/game/game-gauntlet/src/index.ts)
+Source: [`packages/game/game-gauntlet/src/index.ts:33`](../../packages/game/game-gauntlet/src/index.ts)
 <!-- END GENERATED cordis-surface -->

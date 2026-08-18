@@ -683,6 +683,18 @@ export const SERVICE_API: readonly ServiceApiEntry[] = [
         parameters: [{ name: 'scenario', description: 'the objective, game, inputs, bar, and optional baseline.' }, { name: 'session', description: 'the session whose log receives the `gauntlet/round` event.' }, { name: 'attempt', description: 'positive round number; must exceed the previous attempt for this scenario in this session.' }],
         returns: 'the normalized round, including the appended event\'s seq.',
       },
+      {
+        signature: 'nextAttempt(session: Session, scenarioId: string): number',
+        description: 'The attempt number the next round for this scenario in this session would receive — one above the last accepted attempt, or 1 for a new scenario.',
+        parameters: [{ name: 'session', description: 'the session whose attempt history is consulted.' }, { name: 'scenarioId', description: 'the scenario\'s stable id.' }],
+        returns: 'the next strictly increasing attempt number.',
+      },
+      {
+        signature: 'runLoop(session: Session, plan: GauntletLoopPlan): GauntletLoopResult',
+        description: 'Run the builder/critic loop policy: play each candidate input sequence as one round, carrying the best score so far as the next round\'s baseline, and stop at the first round that reaches the bar. Model-free and deterministic; every round lands as a durable `gauntlet/round` event, so resume and fork recover the loop position by folding the log.',
+        parameters: [{ name: 'session', description: 'the session whose log receives the round events.' }, { name: 'plan', description: 'the scenario id, game, bar, and candidate sequences.' }],
+        returns: 'the normalized loop outcome; `winningAttempt` names the passing round when one exists.',
+      },
     ],
   },
   {
@@ -3140,6 +3152,14 @@ export const TYPE_API: readonly TypeApiEntry[] = [
   {
     name: 'GameModule',
     declaration: 'export interface GameModule {\n    readonly id: string;\n    create(): GameInstance;\n}',
+  },
+  {
+    name: 'GauntletLoopPlan',
+    declaration: 'export interface GauntletLoopPlan {\n    readonly scenarioId: string;\n    readonly game: string;\n    readonly bar: number;\n    readonly candidates: readonly (readonly JsonValue[])[];\n}',
+  },
+  {
+    name: 'GauntletLoopResult',
+    declaration: 'export interface GauntletLoopResult {\n    readonly scenarioId: string;\n    readonly attempts: number;\n    readonly best?: number;\n    readonly passed: boolean;\n    readonly winningAttempt?: number;\n}',
   },
   {
     name: 'GauntletRound',

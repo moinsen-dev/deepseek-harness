@@ -203,6 +203,7 @@ flowchart TD
     pkg_game_gauntlet["game-gauntlet"]
     pkg_game_sim["game-sim"]
     pkg_tool_game["tool-game"]
+    pkg_tool_gauntlet["tool-gauntlet"]
   end
   subgraph group_guard["packages/guard"]
     pkg_repeat_tool_reminder["repeat-tool-reminder"]
@@ -867,6 +868,9 @@ flowchart TD
   pkg_tool_game --> pkg_llm
   pkg_tool_game --> pkg_session
   pkg_tool_game --> pkg_tools
+  pkg_tool_gauntlet --> pkg_game_gauntlet
+  pkg_tool_gauntlet --> pkg_invariants
+  pkg_tool_gauntlet --> pkg_tools
   pkg_repeat_tool_reminder --> pkg_agent
   pkg_repeat_tool_reminder --> pkg_invariants
   pkg_repeat_tool_reminder --> pkg_tools
@@ -1583,6 +1587,7 @@ flowchart TD
 | [`session-reference`](../packages/context/session-reference) | `context` | [`agent`](../packages/core/agent), [`compaction`](../packages/compaction/compaction), [`invariants`](../packages/runtime-diagnostics/invariants), [`llm`](../packages/llm/llm), [`output-retention`](../packages/util/output-retention), [`session`](../packages/core/session), [`session-query`](../packages/session-query/session-query) |
 | [`cordis-host-runner`](../packages/extensions/cordis-host-runner) | `extensions` | [`agent`](../packages/core/agent), [`brand`](../packages/util/brand), [`invariants`](../packages/runtime-diagnostics/invariants), [`llm`](../packages/llm/llm), [`scope`](../packages/core/scope), [`session`](../packages/core/session), [`tools`](../packages/core/tools), [`typert-protocol`](../packages/typert/protocol) |
 | [`tool-game`](../packages/game/tool-game) | `game` | [`game`](../packages/game/game), [`invariants`](../packages/runtime-diagnostics/invariants), [`llm`](../packages/llm/llm), [`session`](../packages/core/session), [`tools`](../packages/core/tools) |
+| [`tool-gauntlet`](../packages/game/tool-gauntlet) | `game` | [`game-gauntlet`](../packages/game/game-gauntlet), [`invariants`](../packages/runtime-diagnostics/invariants), [`tools`](../packages/core/tools) |
 | [`repeat-tool-reminder`](../packages/guard/repeat-tool-reminder) | `guard` | [`agent`](../packages/core/agent), [`invariants`](../packages/runtime-diagnostics/invariants), [`tools`](../packages/core/tools) |
 | [`tool-call-timeout-policy`](../packages/guard/timeout-policy) | `guard` | [`invariants`](../packages/runtime-diagnostics/invariants), [`llm`](../packages/llm/llm), [`timeout`](../packages/util/timeout), [`tools`](../packages/core/tools) |
 | [`tool-ask-user`](../packages/interaction/tool-ask-user) | `interaction` | [`agent`](../packages/core/agent), [`invariants`](../packages/runtime-diagnostics/invariants), [`tools`](../packages/core/tools), [`user-questions`](../packages/interaction/user-questions) |

@@ -2465,6 +2465,24 @@ export interface Config {
 
 来源：[`packages/game/tool-game/src/index.ts:31`](../packages/game/tool-game/src/index.ts)
 
+<a id="deepseek-aidsh-tool-gauntlet"></a>
+
+## `@deepseek-ai/dsh-tool-gauntlet`
+
+需要：`tools` · `gauntlet`
+
+```ts config-catalog
+/** Plugin config: tool enablement and the `gauntlet_round` timeout budget. */
+export interface Config {
+  /** Register `gauntlet_round`. Defaults to true. */
+  enabled?: boolean
+  /** Cooperative timeout budget (ms) for `gauntlet_round`. Defaults to 30000. */
+  timeoutMs?: number
+}
+```
+
+来源：[`packages/game/tool-gauntlet/src/index.ts:26`](../packages/game/tool-gauntlet/src/index.ts)
+
 <a id="deepseek-aidsh-tool-goal"></a>
 
 ## `@deepseek-ai/dsh-tool-goal`

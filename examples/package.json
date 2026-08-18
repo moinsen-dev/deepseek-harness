@@ -115,6 +115,7 @@
     "@deepseek-ai/dsh-game-sim": "workspace:*",
     "@deepseek-ai/dsh-game-gauntlet": "workspace:*",
     "@deepseek-ai/dsh-tool-game": "workspace:*",
+    "@deepseek-ai/dsh-tool-gauntlet": "workspace:*",
     "@deepseek-ai/dsh-workflow-worker-thread": "workspace:*",
     "@deepseek-ai/dsh-agent-instructions": "workspace:*"
   }

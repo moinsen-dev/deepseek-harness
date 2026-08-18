@@ -42,6 +42,7 @@
 | `@deepseek-ai/dsh-tool-workflow` | `workflow` | `ctx.tools`、`ctx.workflowEngine`、`ctx.systemPrompt`、`a calling Agent (exec.agent parents the script children)` | `tool/call`、`tool/result` | - | - |
 | `@deepseek-ai/dsh-tool-web` | `web_fetch`、`web_search` | `ctx.tools`、`ctx.web`、`ctx.systemPrompt` | `tool/call`、`tool/result` | - | web_search 和 web_fetch 将提供方选择置于 ctx.web 之后，使模型可见 schema 在更换后端时保持稳定。 |
 | `@deepseek-ai/dsh-tool-game` | `game_list`、`game_play` | `ctx.tools`、`ctx.game` | `tool/call`、`tool/result` | - | game_play 和 game_list 将游戏选择置于 ctx.game 之后，使模型可见 schema 在更换提供方时保持稳定。 |
+| `@deepseek-ai/dsh-tool-gauntlet` | `gauntlet_round` | `ctx.tools`、`ctx.gauntlet` | `tool/call`、`gauntlet/round`、`tool/result` | - | gauntlet_round 将打分置于 ctx.gauntlet 之后，使模型可见 schema 在更换游戏提供方时保持稳定。 |
 
 <a id="deepseek-aidsh-tool-ask-user"></a>
 
@@ -1925,3 +1926,52 @@ web_search 和 web_fetch 将提供方选择置于 ctx.web 之后，使模型可�
 来源：[`packages/game/tool-game/src/index.ts`](../packages/game/tool-game/src/index.ts)
 
 game_play 和 game_list 将游戏选择置于 ctx.game 之后，使模型可见 schema 在更换提供方时保持稳定。
+
+<a id="deepseek-aidsh-tool-gauntlet"></a>
+
+## `@deepseek-ai/dsh-tool-gauntlet`
+
+### `gauntlet_round`
+
+游玩一轮 gauntlet：为已注册游戏提出一个候选输入序列，并取回模型无关的判定——当分数达到门槛时该轮通过。运行时分配严格递增的回合号并持久记录每一轮，因此可以迭代：提出、观察打分结果、提出更好的序列。
+
+```json
+{
+  "type": "object",
+  "properties": {
+    "scenarioId": {
+      "type": "string",
+      "description": "Stable id shared by all rounds of one objective (e.g. \"collect-all\")."
+    },
+    "game": {
+      "type": "string",
+      "description": "Registered game id to play (see game_list)."
+    },
+    "inputs": {
+      "type": "array",
+      "description": "Candidate scripted inputs applied in order, for example [\"down\", \"right\"].",
+      "items": {
+        "type": "string"
+      }
+    },
+    "bar": {
+      "type": "number",
+      "description": "Quality bar: the round passes when its score reaches this number."
+    },
+    "baseline": {
+      "type": "number",
+      "description": "Prior best score to compare against; omit for the first round."
+    }
+  },
+  "required": [
+    "scenarioId",
+    "game",
+    "inputs",
+    "bar"
+  ]
+}
+```
+
+来源：[`packages/game/tool-gauntlet/src/index.ts`](../packages/game/tool-gauntlet/src/index.ts)
+
+gauntlet_round 将打分置于 ctx.gauntlet 之后，使模型可见 schema 在更换游戏提供方时保持稳定。

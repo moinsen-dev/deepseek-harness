@@ -439,7 +439,7 @@ export type SessionEvent<T extends SessionEventType = SessionEventType> = {
 }
 ```
 
-来源：[`packages/game/game-gauntlet/src/types.ts:60`](../packages/game/game-gauntlet/src/types.ts)
+来源：[`packages/game/game-gauntlet/src/types.ts:91`](../packages/game/game-gauntlet/src/types.ts)
 
 ### `goal/*`
 

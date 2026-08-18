@@ -437,7 +437,7 @@ Source: [`packages/feedback/command-feedback/src/index.ts:62`](../packages/feedb
 }
 ```
 
-Source: [`packages/game/game-gauntlet/src/types.ts:60`](../packages/game/game-gauntlet/src/types.ts)
+Source: [`packages/game/game-gauntlet/src/types.ts:91`](../packages/game/game-gauntlet/src/types.ts)
 
 ### `goal/*`
 

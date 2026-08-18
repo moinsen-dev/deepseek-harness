@@ -2,5 +2,5 @@
 # side as of the last confirmed-consistent state. Both languages carry equal authority;
 # after editing either side, bring the other along and re-record with:
 #   pnpm run verify-translation-pairing --write packages/game/game-gauntlet/README.md
-README.md: c695feacfa1fabd567c1b07cfbd357c21a4461be
-README.zh.md: 1ea2e08d4c4269aaac28f795887e8095f0454b53
+README.md: 7963504c4d08ad5c600d6013bd3ff0a8ed75dada
+README.zh.md: b9afdccdc710f17af87f52e56420bc3f21fec8e0

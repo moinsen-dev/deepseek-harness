@@ -63,6 +63,8 @@ import * as ToolWeb from '@deepseek-ai/dsh-tool-web'
 import GameRuntime from '@deepseek-ai/dsh-game'
 import * as GameSim from '@deepseek-ai/dsh-game-sim'
 import * as ToolGame from '@deepseek-ai/dsh-tool-game'
+import GauntletRuntime from '@deepseek-ai/dsh-game-gauntlet'
+import * as ToolGauntlet from '@deepseek-ai/dsh-tool-gauntlet'
 import VmWorkflowEngine from '@deepseek-ai/dsh-workflow-worker-thread'
 import * as ToolRalph from '@deepseek-ai/dsh-tool-ralph'
 import * as ToolWorkflow from '@deepseek-ai/dsh-tool-workflow'
@@ -569,6 +571,24 @@ const TOOL_PACKAGES: ToolPackage[] = [
     },
     note:
       'game_play and game_list keep game selection behind ctx.game so model-visible schemas stay stable across provider swaps.',
+  },
+  {
+    pkg: '@deepseek-ai/dsh-tool-gauntlet',
+    dir: 'tool-gauntlet',
+    source: 'packages/game/tool-gauntlet/src/index.ts',
+    requires: ['ctx.tools', 'ctx.gauntlet'],
+    writes: ['tool/call', 'gauntlet/round', 'tool/result'],
+    async mount(ctx) {
+      // Mount the game stack so the tool registers; its schema does not depend
+      // on which games are registered or which scenario is scored.
+      await ctx.plugin(SessionStore)
+      await ctx.plugin(GameRuntime)
+      await ctx.plugin(GameSim)
+      await ctx.plugin(GauntletRuntime)
+      await ctx.plugin(ToolGauntlet)
+    },
+    note:
+      'gauntlet_round keeps scoring behind ctx.gauntlet so model-visible schemas stay stable across game providers.',
   },
 ]
 

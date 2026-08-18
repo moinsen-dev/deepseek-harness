@@ -175,6 +175,7 @@ flowchart LR
   pkg_tool_game["tool-game"]
   pkg_game_gauntlet["game-gauntlet"]
   svc_gauntlet["ctx.gauntlet<br/>Gauntlet loop: bar-scored rounds with durable gauntlet/round events"]
+  pkg_tool_gauntlet["tool-gauntlet"]
   pkg_spill["spill"]
   svc_spillStore["ctx.spillStore<br/>Spill storage seam"]
   pkg_spill_local["spill-local"]
@@ -330,6 +331,7 @@ flowchart LR
   svc_fs --> pkg_tool_fs
   svc_game --> pkg_game_gauntlet
   svc_game --> pkg_tool_game
+  svc_gauntlet --> pkg_tool_gauntlet
   svc_invariants --> pkg_agent
   svc_invariants --> pkg_agent_loop
   svc_invariants --> pkg_scope
@@ -472,7 +474,7 @@ flowchart LR
 | `ctx.jobs` | `seam` | [`jobs`](../packages/jobs/jobs) | [`jobs-local`](../packages/jobs/jobs-local) | [`tool-bash`](../packages/shell/tool-bash), [`tool-terminal`](../packages/terminal/tool-terminal), [`tool-subagent`](../packages/subagent/tool-subagent), [`tool-jobs`](../packages/jobs/tool-jobs) | - | 生产方（后台 bash、PTY 发送和 subagent 委派）登记正在运行的工作；tool-jobs 是面向模型的控制器，用于读取、列出和终止这些工作；jobs-local 是进程本地注册表。 |
 | `ctx.web` | `seam` | [`web`](../packages/web/web) | [`web-search-exa`](../packages/web/web-search-exa), [`web-search-perplexity`](../packages/web/web-search-perplexity), [`web-search-deepseek`](../packages/web/web-search-deepseek), [`web-fetch-http`](../packages/web/web-fetch-http) | [`tool-web`](../packages/web/tool-web) | - | 搜索和抓取提供方注册到同一个 ctx.web seam；tool-web 负责稳定的面向模型名称。 |
 | `ctx.game` | `seam` | [`game`](../packages/game/game) | [`game-sim`](../packages/game/game-sim) | [`tool-game`](../packages/game/tool-game), [`game-gauntlet`](../packages/game/game-gauntlet) | - | 游戏模块按稳定 id 注册，并以脚本化输入运行，逐次运行校验状态与分数；seam 不依赖会话。 |
-| `ctx.gauntlet` | `core` | [`game-gauntlet`](../packages/game/game-gauntlet) | - | - | - | 以模型无关方式把试玩回合对照场景门槛打分，并追加 log-only 的 gauntlet/round 会话事件；builder/critic 迭代由 goal/ralph/workflow 原语组合而成。 |
+| `ctx.gauntlet` | `core` | [`game-gauntlet`](../packages/game/game-gauntlet) | - | [`tool-gauntlet`](../packages/game/tool-gauntlet) | - | 以模型无关方式把试玩回合对照场景门槛打分，并追加 log-only 的 gauntlet/round 会话事件；runLoop 迭代 builder 候选直至达标，agent 侧迭代由 goal/ralph/workflow 原语组合而成。 |
 | `ctx.spillStore` | `seam` | [`spill`](../packages/spill/spill) | [`spill-local`](../packages/spill/spill-local) | [`spill-policy`](../packages/spill/spill-policy) | - | 后端保存过大的工具文本，并返回面向模型的定位信息和取回提示；spill-policy 是 tools/post-execute 消费方，负责决定何时 spill。 |
 | `ctx.directoryPicker` | `seam` | `directory-picker` | `directory-picker-native`, `directory-picker-browse` | `apiproxy` | - | 带判别标记的交互能力：原生后端在 Host 显示设备上打开一个操作系统选择器，浏览后端为应用内浏览器提供列表与创建原语；双端后端通过其浏览器侧填充 ui-workspace 目录流程的 slot（不通过协议发布）。 |
 | `ctx.webServer` | `core` | `webserver` | - | `connection`, `modules`, `hmr` | - | 普通的 node:http 载体：具名路由注册表、索引转换 tap，以及静态 dist 回退；Web 传输插件注册自己的路由。 |

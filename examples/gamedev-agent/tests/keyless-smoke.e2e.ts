@@ -4,7 +4,9 @@ import { LOADER_SMOKE_TEST_TIMEOUT_MS, runLoaderSmoke } from '@deepseek-ai/dsh-l
 import type { SessionEvent } from '@deepseek-ai/dsh-session'
 
 const binScript = fileURLToPath(new URL('./fixtures/gauntlet-driver.ts', import.meta.url))
+const loopBinScript = fileURLToPath(new URL('./fixtures/gauntlet-loop-driver.ts', import.meta.url))
 const configPath = fileURLToPath(new URL('./fixtures/cli.cordis.yml', import.meta.url))
+const loopConfigPath = fileURLToPath(new URL('./fixtures/cli-loop.cordis.yml', import.meta.url))
 const tsconfigPath = fileURLToPath(new URL('../../../tsconfig.json', import.meta.url))
 
 describe('gamedev-agent keyless smoke', () => {
@@ -33,5 +35,31 @@ describe('gamedev-agent keyless smoke', () => {
     expect(events.filter(event => event.type === 'tool/result').some(event => JSON.stringify(event).includes('score 30'))).toBe(true)
     expect(result).toMatchObject({ type: 'result' })
     expect(String(result?.['output'])).toContain('GAMEDEV tool round trip complete')
+  }, LOADER_SMOKE_TEST_TIMEOUT_MS)
+
+  it('runs the builder/critic loop until the bar passes and then scores one model-driven round', async () => {
+    const { stdout, stderr } = await runLoaderSmoke({
+      label: 'gamedev-agent loop',
+      tempDirPrefix: 'gamedev-agent-loop-smoke-',
+      binScript: loopBinScript,
+      libBinScript: loopBinScript,
+      configPath: loopConfigPath,
+      binArgs: [loopConfigPath, 'propose a strategy that reaches the bar'],
+      tsconfigPath,
+    })
+    const lines = stdout.trimEnd().split('\n').map(line => JSON.parse(line) as Record<string, unknown>)
+    const events = lines.slice(0, -1).map(line => line['event'] as SessionEvent)
+    const result = lines.at(-1)
+    expect(stderr).toBe('')
+
+    const rounds = events.filter(event => event.type === 'gauntlet/round')
+    expect(rounds.map(round => round.data.attempt)).toEqual([1, 2, 3, 4])
+    expect(rounds[1]?.data).toMatchObject({ score: 10, baseline: 0, passed: false })
+    expect(rounds[2]?.data).toMatchObject({ score: 30, baseline: 10, passed: true })
+    expect(rounds[3]?.data).toMatchObject({ attempt: 4, score: 0, bar: 30, passed: false })
+
+    expect(events.filter(event => event.type === 'tool/call' && event.data.name === 'gauntlet_round')).toHaveLength(1)
+    expect(result).toMatchObject({ type: 'result' })
+    expect(String(result?.['output'])).toContain('GAMEDEV loop round trip complete')
   }, LOADER_SMOKE_TEST_TIMEOUT_MS)
 })

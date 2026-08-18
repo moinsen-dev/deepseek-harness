@@ -40,6 +40,7 @@ This table connects model-visible tool names to the plugin package and service s
 | `@deepseek-ai/dsh-tool-workflow` | `workflow` | `ctx.tools`, `ctx.workflowEngine`, `ctx.systemPrompt`, `a calling Agent (exec.agent parents the script children)` | `tool/call`, `tool/result` | - | - |
 | `@deepseek-ai/dsh-tool-web` | `web_fetch`, `web_search` | `ctx.tools`, `ctx.web`, `ctx.systemPrompt` | `tool/call`, `tool/result` | - | web_search and web_fetch keep provider selection behind ctx.web so model-visible schemas stay stable across backend swaps. |
 | `@deepseek-ai/dsh-tool-game` | `game_list`, `game_play` | `ctx.tools`, `ctx.game` | `tool/call`, `tool/result` | - | game_play and game_list keep game selection behind ctx.game so model-visible schemas stay stable across provider swaps. |
+| `@deepseek-ai/dsh-tool-gauntlet` | `gauntlet_round` | `ctx.tools`, `ctx.gauntlet` | `tool/call`, `gauntlet/round`, `tool/result` | - | gauntlet_round keeps scoring behind ctx.gauntlet so model-visible schemas stay stable across game providers. |
 
 <a id="deepseek-aidsh-tool-ask-user"></a>
 
@@ -1920,3 +1921,52 @@ Play one registered game with a scripted input sequence and observe the determin
 Source: [`packages/game/tool-game/src/index.ts`](../packages/game/tool-game/src/index.ts)
 
 game_play and game_list keep game selection behind ctx.game so model-visible schemas stay stable across provider swaps.
+
+<a id="deepseek-aidsh-tool-gauntlet"></a>
+
+## `@deepseek-ai/dsh-tool-gauntlet`
+
+### `gauntlet_round`
+
+Play one gauntlet round: propose a candidate input sequence for a registered game, and get a model-free verdict back — the round passes exactly when its score reaches the bar. The runtime assigns the strictly increasing attempt number and logs every round durably, so iterate: propose, observe the scored result, propose a better sequence.
+
+```json
+{
+  "type": "object",
+  "properties": {
+    "scenarioId": {
+      "type": "string",
+      "description": "Stable id shared by all rounds of one objective (e.g. \"collect-all\")."
+    },
+    "game": {
+      "type": "string",
+      "description": "Registered game id to play (see game_list)."
+    },
+    "inputs": {
+      "type": "array",
+      "description": "Candidate scripted inputs applied in order, for example [\"down\", \"right\"].",
+      "items": {
+        "type": "string"
+      }
+    },
+    "bar": {
+      "type": "number",
+      "description": "Quality bar: the round passes when its score reaches this number."
+    },
+    "baseline": {
+      "type": "number",
+      "description": "Prior best score to compare against; omit for the first round."
+    }
+  },
+  "required": [
+    "scenarioId",
+    "game",
+    "inputs",
+    "bar"
+  ]
+}
+```
+
+Source: [`packages/game/tool-gauntlet/src/index.ts`](../packages/game/tool-gauntlet/src/index.ts)
+
+gauntlet_round keeps scoring behind ctx.gauntlet so model-visible schemas stay stable across game providers.

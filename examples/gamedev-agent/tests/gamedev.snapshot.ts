@@ -9,8 +9,12 @@ import { LOADER_SMOKE_TEST_TIMEOUT_MS, runLoaderSmoke } from '@deepseek-ai/dsh-l
 const snapshotsDir = join(dirname(fileURLToPath(import.meta.url)), 'snapshots')
 const scenarioDir = join(snapshotsDir, 'gauntlet-loop')
 const streamExpected = join(scenarioDir, 'stream-json.expected.jsonl')
+const loopScenarioDir = join(snapshotsDir, 'builder-critic-loop')
+const loopStreamExpected = join(loopScenarioDir, 'stream-json.expected.jsonl')
 const binScript = fileURLToPath(new URL('./fixtures/gauntlet-driver.ts', import.meta.url))
+const loopBinScript = fileURLToPath(new URL('./fixtures/gauntlet-loop-driver.ts', import.meta.url))
 const configPath = fileURLToPath(new URL('./fixtures/cli.cordis.yml', import.meta.url))
+const loopConfigPath = fileURLToPath(new URL('./fixtures/cli-loop.cordis.yml', import.meta.url))
 const tsconfigPath = fileURLToPath(new URL('../../../tsconfig.json', import.meta.url))
 const refreshing = process.env.DSH_SNAPSHOT === 'refresh'
 
@@ -79,5 +83,31 @@ describe('gamedev-agent keyless snapshot', () => {
       await writeFile(streamExpected, normalized)
     }
     expect(normalized).toBe(await readFile(streamExpected, 'utf8'))
+  }, LOADER_SMOKE_TEST_TIMEOUT_MS)
+
+  it('pins the builder/critic loop and the model-driven gauntlet_round in the canonical stream', async () => {
+    let runCwd = ''
+    const result = await runLoaderSmoke({
+      label: 'gamedev-agent builder critic loop stream-json snapshot',
+      tempDirPrefix: 'gamedev-agent-loop-snapshot-',
+      binScript: loopBinScript,
+      libBinScript: loopBinScript,
+      configPath: loopConfigPath,
+      binArgs: [loopConfigPath, 'propose a strategy that reaches the bar'],
+      tsconfigPath,
+      env: {
+        DSH_SNAPSHOT: 'replay',
+        NODE_OPTIONS: [process.env.NODE_OPTIONS, '--disable-warning=ExperimentalWarning'].filter(Boolean).join(' '),
+      },
+      prepare: (cwd) => { runCwd = cwd },
+    })
+
+    expect(result.stderr).toBe('')
+    const normalized = normalizeHeadlessStream(result.stdout, runCwd)
+    if (refreshing) {
+      await mkdir(loopScenarioDir, { recursive: true })
+      await writeFile(loopStreamExpected, normalized)
+    }
+    expect(normalized).toBe(await readFile(loopStreamExpected, 'utf8'))
   }, LOADER_SMOKE_TEST_TIMEOUT_MS)
 })

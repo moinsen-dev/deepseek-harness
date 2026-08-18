@@ -173,6 +173,7 @@ flowchart LR
   pkg_tool_game["tool-game"]
   pkg_game_gauntlet["game-gauntlet"]
   svc_gauntlet["ctx.gauntlet<br/>Gauntlet loop: bar-scored rounds with durable gauntlet/round events"]
+  pkg_tool_gauntlet["tool-gauntlet"]
   pkg_spill["spill"]
   svc_spillStore["ctx.spillStore<br/>Spill storage seam"]
   pkg_spill_local["spill-local"]
@@ -328,6 +329,7 @@ flowchart LR
   svc_fs --> pkg_tool_fs
   svc_game --> pkg_game_gauntlet
   svc_game --> pkg_tool_game
+  svc_gauntlet --> pkg_tool_gauntlet
   svc_invariants --> pkg_agent
   svc_invariants --> pkg_agent_loop
   svc_invariants --> pkg_scope
@@ -470,7 +472,7 @@ flowchart LR
 | `ctx.jobs` | `seam` | [`jobs`](../packages/jobs/jobs) | [`jobs-local`](../packages/jobs/jobs-local) | [`tool-bash`](../packages/shell/tool-bash), [`tool-terminal`](../packages/terminal/tool-terminal), [`tool-subagent`](../packages/subagent/tool-subagent), [`tool-jobs`](../packages/jobs/tool-jobs) | - | Producers (background bash, PTY sends, and subagent delegations) register running work; tool-jobs is the model-facing controller that reads, lists, and kills it; jobs-local is the process-local registry. |
 | `ctx.web` | `seam` | [`web`](../packages/web/web) | [`web-search-exa`](../packages/web/web-search-exa), [`web-search-perplexity`](../packages/web/web-search-perplexity), [`web-search-deepseek`](../packages/web/web-search-deepseek), [`web-fetch-http`](../packages/web/web-fetch-http) | [`tool-web`](../packages/web/tool-web) | - | Search and fetch providers register into one ctx.web seam; tool-web owns the stable model-facing names. |
 | `ctx.game` | `seam` | [`game`](../packages/game/game) | [`game-sim`](../packages/game/game-sim) | [`tool-game`](../packages/game/tool-game), [`game-gauntlet`](../packages/game/game-gauntlet) | - | Game modules register by stable id and play scripted inputs with per-run state and score validation; the seam is session-free. |
-| `ctx.gauntlet` | `core` | [`game-gauntlet`](../packages/game/game-gauntlet) | - | - | - | Scores playtest rounds model-free against a scenario bar and appends log-only gauntlet/round session events; builder/critic iteration composes from goal/ralph/workflow primitives. |
+| `ctx.gauntlet` | `core` | [`game-gauntlet`](../packages/game/game-gauntlet) | - | [`tool-gauntlet`](../packages/game/tool-gauntlet) | - | Scores playtest rounds model-free against a scenario bar and appends log-only gauntlet/round session events; runLoop iterates builder candidates until the bar passes, and the agent-side iteration composes from goal/ralph/workflow primitives. |
 | `ctx.spillStore` | `seam` | [`spill`](../packages/spill/spill) | [`spill-local`](../packages/spill/spill-local) | [`spill-policy`](../packages/spill/spill-policy) | - | The backend saves oversized tool text and returns a model-facing locator plus retrieval hint; spill-policy is the tools/post-execute consumer that decides when to spill. |
 | `ctx.directoryPicker` | `seam` | `directory-picker` | `directory-picker-native`, `directory-picker-browse` | `apiproxy` | - | Discriminated interaction capability: the native backend opens one OS chooser on the host display, the browse backend serves listing/creation primitives for the in-app browser; dual-face backends fill ui-workspace directory-flow slots from their browser halves (no wire advertisement). |
 | `ctx.webServer` | `core` | `webserver` | - | `connection`, `modules`, `hmr` | - | Plain node:http carrier: named-route registry, index transform taps, and the static dist fallback; web-transport plugins register their own routes. |

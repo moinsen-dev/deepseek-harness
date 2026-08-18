@@ -64,6 +64,11 @@
 - id: tool-game
   name: '@deepseek-ai/dsh-tool-game'
 
+# The model drives gauntlet rounds through gauntlet_round; the runtime assigns
+# strictly increasing attempts and logs every round.
+- id: tool-gauntlet
+  name: '@deepseek-ai/dsh-tool-gauntlet'
+
 - id: gauntlet
   name: '@deepseek-ai/dsh-game-gauntlet'
 

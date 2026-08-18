@@ -502,8 +502,8 @@ const SERVICE_ROLES: ServiceRole[] = [
     title: 'Gauntlet loop: bar-scored rounds with durable gauntlet/round events',
     mode: 'core',
     implementations: [],
-    consumers: [],
-    note: 'Scores playtest rounds model-free against a scenario bar and appends log-only gauntlet/round session events; builder/critic iteration composes from goal/ralph/workflow primitives.',
+    consumers: ['tool-gauntlet'],
+    note: 'Scores playtest rounds model-free against a scenario bar and appends log-only gauntlet/round session events; runLoop iterates builder candidates until the bar passes, and the agent-side iteration composes from goal/ralph/workflow primitives.',
   },
   {
     key: 'spillStore',

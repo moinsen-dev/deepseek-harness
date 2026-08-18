@@ -9,6 +9,7 @@ This family provides deterministic playable games, the model-facing tools that p
 | [`game/`](game/README.md) | Defines the game-module registry, playtest execution, and shared errors | `ctx.game` |
 | [`game-sim/`](game-sim/README.md) | Provides the built-in deterministic `coin-chase` game | registers on `ctx.game` |
 | [`tool-game/`](tool-game/README.md) | Exposes `game_play` and `game_list` to the model | registers on `ctx.tools` |
-| [`game-gauntlet/`](game-gauntlet/README.md) | Scores rounds against a quality bar and logs durable `gauntlet/round` session events | `ctx.gauntlet` |
+| [`game-gauntlet/`](game-gauntlet/README.md) | Scores rounds against a quality bar, runs the builder/critic loop policy, and logs durable `gauntlet/round` session events | `ctx.gauntlet` |
+| [`tool-gauntlet/`](tool-gauntlet/README.md) | Exposes `gauntlet_round` to the model, with runtime-assigned attempts | registers on `ctx.tools` |
 
 The demo composition that turns these into a playable loop is [examples/gamedev-agent](../../examples/gamedev-agent/README.md); the loop's builder/critic iteration is composed from goal, Ralph, and workflow primitives rather than shipped here.

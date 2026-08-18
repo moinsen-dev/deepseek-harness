@@ -1959,6 +1959,16 @@
       "doc": "docs/subsystems/game.md",
       "symbol": "GauntletRound",
       "source": "packages/game/game-gauntlet/src/types.ts"
+    },
+    {
+      "doc": "docs/subsystems/game.md",
+      "symbol": "GauntletLoopPlan",
+      "source": "packages/game/game-gauntlet/src/types.ts"
+    },
+    {
+      "doc": "docs/subsystems/game.md",
+      "symbol": "GauntletLoopResult",
+      "source": "packages/game/game-gauntlet/src/types.ts"
     }
   ]
 }

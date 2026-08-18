@@ -689,6 +689,9 @@ importers:
       '@deepseek-ai/dsh-tool-game':
         specifier: workspace:*
         version: link:../packages/game/tool-game
+      '@deepseek-ai/dsh-tool-gauntlet':
+        specifier: workspace:*
+        version: link:../packages/game/tool-gauntlet
       '@deepseek-ai/dsh-tool-goal':
         specifier: workspace:*
         version: link:../packages/goal/tool-goal
@@ -4479,6 +4482,43 @@ importers:
       '@deepseek-ai/dsh-game':
         specifier: workspace:^
         version: link:../game
+      '@deepseek-ai/dsh-game-sim':
+        specifier: workspace:^
+        version: link:../game-sim
+      '@deepseek-ai/dsh-invariants':
+        specifier: workspace:^
+        version: link:../../runtime-diagnostics/invariants
+      '@deepseek-ai/dsh-llm':
+        specifier: workspace:^
+        version: link:../../llm/llm
+      '@deepseek-ai/dsh-session':
+        specifier: workspace:^
+        version: link:../../core/session
+      '@deepseek-ai/dsh-system-prompt':
+        specifier: workspace:^
+        version: link:../../core/system-prompt
+      '@deepseek-ai/dsh-tools':
+        specifier: workspace:^
+        version: link:../../core/tools
+
+  packages/game/tool-gauntlet:
+    dependencies:
+      '@deepseek-ai/schemastery':
+        specifier: link:../../../vendor/schemastery
+        version: link:../../../vendor/schemastery
+    devDependencies:
+      '@deepseek-ai/cordis':
+        specifier: workspace:^
+        version: link:../../../vendor/cordis
+      '@deepseek-ai/dsh-agent':
+        specifier: workspace:^
+        version: link:../../core/agent
+      '@deepseek-ai/dsh-game':
+        specifier: workspace:^
+        version: link:../game
+      '@deepseek-ai/dsh-game-gauntlet':
+        specifier: workspace:^
+        version: link:../game-gauntlet
       '@deepseek-ai/dsh-game-sim':
         specifier: workspace:^
         version: link:../game-sim

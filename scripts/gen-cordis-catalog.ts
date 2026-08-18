@@ -514,6 +514,8 @@ export const TYPE_LINK_EXEMPTIONS: Readonly<Record<string, string>> = {
   PlaytestResult: 'playtest result contract is owned by packages/game/game/README.md',
   GauntletRound: 'gauntlet round contract is owned by packages/game/game-gauntlet/README.md',
   GauntletScenario: 'gauntlet scenario contract is owned by packages/game/game-gauntlet/README.md',
+  GauntletLoopPlan: 'gauntlet loop plan contract is owned by packages/game/game-gauntlet/README.md',
+  GauntletLoopResult: 'gauntlet loop result contract is owned by packages/game/game-gauntlet/README.md',
   BeginCommandRequest: 'event-local request contract is owned by packages/client/ui-input-trigger/src/types.ts',
   InsertReferenceRequest: 'event-local request contract is owned by packages/client/ui-input-trigger/src/types.ts',
   ConsumeTokenRequest: 'event-local request contract is owned by packages/client/ui-input-trigger/src/types.ts',

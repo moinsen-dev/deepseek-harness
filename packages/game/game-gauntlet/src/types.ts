@@ -50,6 +50,37 @@ export interface GauntletRound {
   readonly eventSeq: number
 }
 
+/**
+ * One builder/critic loop plan: a fixed game and quality bar plus the
+ * candidate input sequences the builder produced. The loop plays each
+ * candidate as one round, carries the best score so far as the next round's
+ * baseline, and stops at the first round that reaches the bar.
+ */
+export interface GauntletLoopPlan {
+  /** Stable scenario id shared by every round of this loop. */
+  readonly scenarioId: string
+  /** Registered game id the loop plays. */
+  readonly game: string
+  /** Quality bar: the loop stops once a round reaches this number. */
+  readonly bar: number
+  /** Candidate scripted input sequences, played in order until the bar passes. */
+  readonly candidates: readonly (readonly JsonValue[])[]
+}
+
+/** Normalized outcome of one completed loop run. */
+export interface GauntletLoopResult {
+  /** The scenario's stable id. */
+  readonly scenarioId: string
+  /** Number of rounds the loop started. */
+  readonly attempts: number
+  /** Best score across the started rounds, when any round ran. */
+  readonly best?: number
+  /** Whether a round reached the bar. */
+  readonly passed: boolean
+  /** The attempt that reached the bar, when one exists. */
+  readonly winningAttempt?: number
+}
+
 declare module '@deepseek-ai/dsh-session/types' {
   interface SessionEventMap {
     /**
