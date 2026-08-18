@@ -111,6 +111,10 @@
     "@deepseek-ai/dsh-user-questions": "workspace:*",
     "@deepseek-ai/dsh-web": "workspace:*",
     "@deepseek-ai/dsh-web-fetch-http": "workspace:*",
+    "@deepseek-ai/dsh-game": "workspace:*",
+    "@deepseek-ai/dsh-game-sim": "workspace:*",
+    "@deepseek-ai/dsh-game-gauntlet": "workspace:*",
+    "@deepseek-ai/dsh-tool-game": "workspace:*",
     "@deepseek-ai/dsh-workflow-worker-thread": "workspace:*",
     "@deepseek-ai/dsh-agent-instructions": "workspace:*"
   }

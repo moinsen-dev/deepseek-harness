@@ -167,6 +167,12 @@ flowchart LR
   pkg_web_search_perplexity["web-search-perplexity"]
   pkg_web_search_deepseek["web-search-deepseek"]
   pkg_web_fetch_http["web-fetch-http"]
+  pkg_game["game"]
+  svc_game["ctx.game<br/>Deterministic game-module registry and playtest execution"]
+  pkg_game_sim["game-sim"]
+  pkg_tool_game["tool-game"]
+  pkg_game_gauntlet["game-gauntlet"]
+  svc_gauntlet["ctx.gauntlet<br/>Gauntlet loop: bar-scored rounds with durable gauntlet/round events"]
   pkg_spill["spill"]
   svc_spillStore["ctx.spillStore<br/>Spill storage seam"]
   pkg_spill_local["spill-local"]
@@ -223,6 +229,9 @@ flowchart LR
   pkg_fs_e2b --> svc_fs
   pkg_fs_local --> svc_fs
   pkg_fs_sandbox --> svc_fs
+  pkg_game --> svc_game
+  pkg_game_gauntlet --> svc_gauntlet
+  pkg_game_sim --> svc_game
   pkg_goal --> svc_goals
   pkg_invariants --> svc_invariants
   pkg_jobs --> svc_jobs
@@ -317,6 +326,8 @@ flowchart LR
   svc_e2b --> pkg_fs_e2b
   svc_e2b --> pkg_subprocess_e2b
   svc_fs --> pkg_tool_fs
+  svc_game --> pkg_game_gauntlet
+  svc_game --> pkg_tool_game
   svc_invariants --> pkg_agent
   svc_invariants --> pkg_agent_loop
   svc_invariants --> pkg_scope
@@ -458,6 +469,8 @@ flowchart LR
 | `ctx.subagents` | `seam` | [`subagent`](../packages/subagent/subagent) | [`subagent-spawn-in-process`](../packages/subagent/subagent-spawn-in-process), [`subagent-fork-in-process`](../packages/subagent/subagent-fork-in-process), [`subagent-acp`](../packages/subagent/subagent-acp), [`subagent-codex`](../packages/subagent/subagent-codex), [`subagent-claude-code`](../packages/subagent/subagent-claude-code), [`subagent-dsh-sdk`](../packages/subagent/subagent-dsh-sdk) | [`tool-subagent`](../packages/subagent/tool-subagent), [`tool-subagent-control`](../packages/subagent/tool-subagent-control), [`tool-ralph`](../packages/workflow/tool-ralph) | - | Providers implement transports; the service also owns optional Activation-based continuation orchestration, tool-subagent selects one-shot or continuable delegation, tool-subagent-control delivers follow-ups, and tool-ralph requires one fresh structured-output route. |
 | `ctx.jobs` | `seam` | [`jobs`](../packages/jobs/jobs) | [`jobs-local`](../packages/jobs/jobs-local) | [`tool-bash`](../packages/shell/tool-bash), [`tool-terminal`](../packages/terminal/tool-terminal), [`tool-subagent`](../packages/subagent/tool-subagent), [`tool-jobs`](../packages/jobs/tool-jobs) | - | Producers (background bash, PTY sends, and subagent delegations) register running work; tool-jobs is the model-facing controller that reads, lists, and kills it; jobs-local is the process-local registry. |
 | `ctx.web` | `seam` | [`web`](../packages/web/web) | [`web-search-exa`](../packages/web/web-search-exa), [`web-search-perplexity`](../packages/web/web-search-perplexity), [`web-search-deepseek`](../packages/web/web-search-deepseek), [`web-fetch-http`](../packages/web/web-fetch-http) | [`tool-web`](../packages/web/tool-web) | - | Search and fetch providers register into one ctx.web seam; tool-web owns the stable model-facing names. |
+| `ctx.game` | `seam` | [`game`](../packages/game/game) | [`game-sim`](../packages/game/game-sim) | [`tool-game`](../packages/game/tool-game), [`game-gauntlet`](../packages/game/game-gauntlet) | - | Game modules register by stable id and play scripted inputs with per-run state and score validation; the seam is session-free. |
+| `ctx.gauntlet` | `core` | [`game-gauntlet`](../packages/game/game-gauntlet) | - | - | - | Scores playtest rounds model-free against a scenario bar and appends log-only gauntlet/round session events; builder/critic iteration composes from goal/ralph/workflow primitives. |
 | `ctx.spillStore` | `seam` | [`spill`](../packages/spill/spill) | [`spill-local`](../packages/spill/spill-local) | [`spill-policy`](../packages/spill/spill-policy) | - | The backend saves oversized tool text and returns a model-facing locator plus retrieval hint; spill-policy is the tools/post-execute consumer that decides when to spill. |
 | `ctx.directoryPicker` | `seam` | `directory-picker` | `directory-picker-native`, `directory-picker-browse` | `apiproxy` | - | Discriminated interaction capability: the native backend opens one OS chooser on the host display, the browse backend serves listing/creation primitives for the in-app browser; dual-face backends fill ui-workspace directory-flow slots from their browser halves (no wire advertisement). |
 | `ctx.webServer` | `core` | `webserver` | - | `connection`, `modules`, `hmr` | - | Plain node:http carrier: named-route registry, index transform taps, and the static dist fallback; web-transport plugins register their own routes. |

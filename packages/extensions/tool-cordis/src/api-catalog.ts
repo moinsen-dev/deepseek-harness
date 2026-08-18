@@ -648,6 +648,44 @@ export const SERVICE_API: readonly ServiceApiEntry[] = [
     ],
   },
   {
+    key: 'game',
+    summary: 'The game capability service.',
+    description: 'The game capability service. Registered as `ctx.game` (one instance per context).\n\nExecution semantics: a run applies inputs in order, stops early when the instance reports `done()`, and rejects with GameError when the request exceeds the step cap, the game id is unknown, the run is aborted, a state snapshot is not lossless JSON, or the final score is not finite.',
+    methods: [
+      {
+        signature: 'registerModule(module: GameModule): () => void',
+        description: 'Register a game module. Throws GameError `GAME_DUPLICATE_MODULE` if its id is already registered. Returns a disposer; the registration is also disposed with the calling fiber.',
+        parameters: [{ name: 'module', description: 'the module; its `id` is the registry key.' }],
+        returns: 'the disposer that unregisters the module.',
+      },
+      {
+        signature: 'list(): readonly GameModule[]',
+        description: 'All registered modules, in registration order.',
+        parameters: [],
+        returns: 'a fresh array of the registered modules.',
+      },
+      {
+        signature: 'play(request: PlaytestRequest, signal?: AbortSignal): PlaytestResult',
+        description: 'Play one request through the registered module. Cancellation is cooperative: the signal is checked before each applied input, so an abort mid-run stops before the next input and never after the final one. Synchronous by contract — modules are deterministic in-process simulations; engine-backed providers require the deferred asynchronous contract.',
+        parameters: [{ name: 'request', description: 'the game id plus the scripted input sequence.' }, { name: 'signal', description: 'optional cancellation signal checked between inputs.' }],
+        returns: 'the normalized playtest outcome.',
+      },
+    ],
+  },
+  {
+    key: 'gauntlet',
+    summary: 'The gauntlet runtime.',
+    description: 'The gauntlet runtime. Registered as `ctx.gauntlet` (one instance per context). Enforces strictly increasing attempt numbers per session and scenario before playing, and writes one `gauntlet/round` session event per accepted round.',
+    methods: [
+      {
+        signature: 'run(scenario: GauntletScenario, session: Session, attempt: number): GauntletRound',
+        description: 'Run one gauntlet round: validate the scenario and attempt, play the game, compare the score against the bar, and append the durable round event. Synchronous like the seam\'s play — deterministic in-process simulation.',
+        parameters: [{ name: 'scenario', description: 'the objective, game, inputs, bar, and optional baseline.' }, { name: 'session', description: 'the session whose log receives the `gauntlet/round` event.' }, { name: 'attempt', description: 'positive round number; must exceed the previous attempt for this scenario in this session.' }],
+        returns: 'the normalized round, including the appended event\'s seq.',
+      },
+    ],
+  },
+  {
     key: 'goals',
     summary: 'Goal service (`ctx.goals`) backed exclusively by the owning session log.',
     description: 'Goal service (`ctx.goals`) backed exclusively by the owning session log.',
@@ -3096,6 +3134,22 @@ export const TYPE_API: readonly TypeApiEntry[] = [
     declaration: 'export interface FsWriteOutcome {\n    operation: \'create\' | \'update\';\n    version: FsVersion;\n    before: string | null;\n    after: string;\n}',
   },
   {
+    name: 'GameInstance',
+    declaration: 'export interface GameInstance {\n    state(): JsonValue;\n    step(input: JsonValue): void;\n    done(): boolean;\n    score(): number;\n}',
+  },
+  {
+    name: 'GameModule',
+    declaration: 'export interface GameModule {\n    readonly id: string;\n    create(): GameInstance;\n}',
+  },
+  {
+    name: 'GauntletRound',
+    declaration: 'export interface GauntletRound {\n    readonly scenarioId: string;\n    readonly game: string;\n    readonly attempt: number;\n    readonly steps: number;\n    readonly score: number;\n    readonly bar: number;\n    readonly baseline?: number;\n    readonly passed: boolean;\n    readonly eventSeq: number;\n}',
+  },
+  {
+    name: 'GauntletScenario',
+    declaration: 'export interface GauntletScenario {\n    readonly id: string;\n    readonly game: string;\n    readonly inputs: readonly JsonValue[];\n    readonly bar: number;\n    readonly baseline?: number;\n}',
+  },
+  {
     name: 'GenerateOptions',
     declaration: 'export interface GenerateOptions {\n    provider: string;\n    model: string;\n    reasoningEffort?: ReasoningEffortId;\n    messages: Message[];\n    system?: string;\n    tools?: ToolSchema[];\n    temperature?: number;\n    maxTokens?: number;\n    stop?: string[];\n    signal?: AbortSignal;\n    sessionId?: Branded<\'SessionId\'>;\n    purpose?: \'compaction\' | \'session-title\';\n}',
   },
@@ -3482,6 +3536,14 @@ export const TYPE_API: readonly TypeApiEntry[] = [
   {
     name: 'PermissionSelect',
     declaration: 'export interface PermissionSelect {\n    options: PresetOption[];\n    currentValue: string;\n}',
+  },
+  {
+    name: 'PlaytestRequest',
+    declaration: 'export interface PlaytestRequest {\n    readonly game: string;\n    readonly inputs: readonly JsonValue[];\n}',
+  },
+  {
+    name: 'PlaytestResult',
+    declaration: 'export interface PlaytestResult {\n    readonly game: string;\n    readonly steps: number;\n    readonly state: JsonValue;\n    readonly score: number;\n    readonly done: boolean;\n}',
   },
   {
     name: 'PostToolDecision',

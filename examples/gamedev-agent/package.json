@@ -1,0 +1,7 @@
+{
+  "name": "gamedev-agent-example",
+  "private": true,
+  "version": "0.0.1",
+  "type": "module",
+  "description": "Runnable demo: a game-developer agent playing and scoring its own games through the game seam and gauntlet loop"
+}

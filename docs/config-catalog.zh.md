@@ -626,6 +626,20 @@ export type Config = LocalConfig
 
 来源：[`packages/fs/fs-sandbox/src/index.ts:49`](../packages/fs/fs-sandbox/src/index.ts)
 
+<a id="deepseek-aidsh-game"></a>
+
+## `@deepseek-ai/dsh-game`
+
+```ts config-catalog
+/** Config for the game seam: the per-run input cap enforced during play. */
+export interface GameRuntimeConfig {
+  /** Maximum number of inputs one playtest run may apply. */
+  readonly maxSteps?: number
+}
+```
+
+来源：[`packages/game/game/src/index.ts:28`](../packages/game/game/src/index.ts)
+
 <a id="deepseek-aidsh-goal"></a>
 
 ## `@deepseek-ai/dsh-goal`
@@ -2431,6 +2445,26 @@ export interface Config {
 
 来源：[`packages/fs/tool-fs-search/src/index.ts:73`](../packages/fs/tool-fs-search/src/index.ts)
 
+<a id="deepseek-aidsh-tool-game"></a>
+
+## `@deepseek-ai/dsh-tool-game`
+
+需要：`tools` · `game`
+
+```ts config-catalog
+/** Plugin config: which game tools to register and the `game_play` timeout budget. */
+export interface Config {
+  /** Register `game_play`. Defaults to true. */
+  play?: boolean
+  /** Register `game_list`. Defaults to true. */
+  list?: boolean
+  /** Cooperative timeout budget (ms) for `game_play`. Defaults to 30000. */
+  playTimeoutMs?: number
+}
+```
+
+来源：[`packages/game/tool-game/src/index.ts:31`](../packages/game/tool-game/src/index.ts)
+
 <a id="deepseek-aidsh-tool-goal"></a>
 
 ## `@deepseek-ai/dsh-tool-goal`
@@ -3069,6 +3103,8 @@ export interface Config {
 - `@deepseek-ai/dsh-cordis-client-runner`（[`packages/extensions/cordis-client-runner/src/index.ts`](../packages/extensions/cordis-client-runner/src/index.ts)）
 - `@deepseek-ai/dsh-fs-e2b` — 需要 `e2b`（[`packages/e2b/fs-e2b/src/index.ts`](../packages/e2b/fs-e2b/src/index.ts)）
 - `@deepseek-ai/dsh-fs-observation-policy`（[`packages/fs/fs-observation-policy/src/index.ts`](../packages/fs/fs-observation-policy/src/index.ts)）
+- `@deepseek-ai/dsh-game-gauntlet` — 需要 `game` · `sessions`（[`packages/game/game-gauntlet/src/index.ts`](../packages/game/game-gauntlet/src/index.ts)）
+- `@deepseek-ai/dsh-game-sim` — 需要 `game`（[`packages/game/game-sim/src/index.ts`](../packages/game/game-sim/src/index.ts)）
 - `@deepseek-ai/dsh-goal-round-driver` — 需要 `agents` · `goals` · `sessions`（[`packages/goal/goal-round-driver/src/index.ts`](../packages/goal/goal-round-driver/src/index.ts)）
 - `@deepseek-ai/dsh-host-directory-picker-auto` — 需要 `webServer` · `loader`（[`packages/host/directory-picker-auto/src/index.ts`](../packages/host/directory-picker-auto/src/index.ts)）
 - `@deepseek-ai/dsh-host-directory-picker-native`（[`packages/host/directory-picker-native/src/index.ts`](../packages/host/directory-picker-native/src/index.ts)）

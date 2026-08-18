@@ -405,6 +405,40 @@ Source: [`packages/compaction/compaction/src/types.ts:33`](../packages/compactio
 
 Source: [`packages/feedback/command-feedback/src/index.ts:62`](../packages/feedback/command-feedback/src/index.ts)
 
+### `gauntlet/*`
+
+<a id="gauntletround--log-only"></a>
+
+#### `gauntlet/round` — log-only
+
+```ts persistence-catalog
+/**
+ * One completed gauntlet round — log-only, no surfaceOp. `passed` is the
+ * model-free bar comparison `score >= bar`; every field is a durable fact
+ * a resume, fork, or replay can fold without re-running the game.
+ */
+'gauntlet/round': {
+  /** The scenario's stable id, shared by all rounds of one objective. */
+  scenarioId: string
+  /** The game id that was played. */
+  game: string
+  /** Positive round number, strictly increasing per scenario and session. */
+  attempt: number
+  /** Number of inputs actually applied. */
+  steps: number
+  /** Final objective score. */
+  score: number
+  /** The quality bar the score was compared against. */
+  bar: number
+  /** Prior best score, when the scenario carried one. */
+  baseline?: number
+  /** Whether the round reached the bar. */
+  passed: boolean
+}
+```
+
+Source: [`packages/game/game-gauntlet/src/types.ts:60`](../packages/game/game-gauntlet/src/types.ts)
+
 ### `goal/*`
 
 <a id="goalchange--log-only"></a>

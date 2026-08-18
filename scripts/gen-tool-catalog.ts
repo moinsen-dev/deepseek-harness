@@ -60,6 +60,9 @@ import * as ToolTasks from '@deepseek-ai/dsh-tool-jobs'
 import * as ToolTodo from '@deepseek-ai/dsh-tool-todo'
 import * as ToolSubagent from '@deepseek-ai/dsh-tool-subagent'
 import * as ToolWeb from '@deepseek-ai/dsh-tool-web'
+import GameRuntime from '@deepseek-ai/dsh-game'
+import * as GameSim from '@deepseek-ai/dsh-game-sim'
+import * as ToolGame from '@deepseek-ai/dsh-tool-game'
 import VmWorkflowEngine from '@deepseek-ai/dsh-workflow-worker-thread'
 import * as ToolRalph from '@deepseek-ai/dsh-tool-ralph'
 import * as ToolWorkflow from '@deepseek-ai/dsh-tool-workflow'
@@ -550,6 +553,22 @@ const TOOL_PACKAGES: ToolPackage[] = [
     },
     note:
       'web_search and web_fetch keep provider selection behind ctx.web so model-visible schemas stay stable across backend swaps.',
+  },
+  {
+    pkg: '@deepseek-ai/dsh-tool-game',
+    dir: 'tool-game',
+    source: 'packages/game/tool-game/src/index.ts',
+    requires: ['ctx.tools', 'ctx.game'],
+    writes: ['tool/call', 'tool/result'],
+    async mount(ctx) {
+      // Mount the seam and the built-in sim game so both tools register; their
+      // schemas do not depend on which games are registered.
+      await ctx.plugin(GameRuntime)
+      await ctx.plugin(GameSim)
+      await ctx.plugin(ToolGame)
+    },
+    note:
+      'game_play and game_list keep game selection behind ctx.game so model-visible schemas stay stable across provider swaps.',
   },
 ]
 

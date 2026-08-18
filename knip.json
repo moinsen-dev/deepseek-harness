@@ -35,6 +35,8 @@
     },
     "examples": {
       "entry": [
+        "gamedev-agent/tests/fixtures/gamedev-mock-llm.ts",
+        "gamedev-agent/tests/fixtures/gauntlet-driver.ts",
         "headless-agent/tests/fixtures/cli-mock-llm.ts",
         "headless-agent/tests/fixtures/semantic-checkpoint-agent.ts",
         "headless-agent/tests/fixtures/subagent-diagnostic-agent.ts",

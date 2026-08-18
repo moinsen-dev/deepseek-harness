@@ -1929,6 +1929,36 @@
       "doc": "docs/subsystems/feedback.md",
       "symbol": "MessageFeedbackDeleteResult",
       "source": "packages/feedback/message-feedback/src/types.ts"
+    },
+    {
+      "doc": "docs/subsystems/game.md",
+      "symbol": "GameModule",
+      "source": "packages/game/game/src/types.ts"
+    },
+    {
+      "doc": "docs/subsystems/game.md",
+      "symbol": "GameInstance",
+      "source": "packages/game/game/src/types.ts"
+    },
+    {
+      "doc": "docs/subsystems/game.md",
+      "symbol": "PlaytestRequest",
+      "source": "packages/game/game/src/types.ts"
+    },
+    {
+      "doc": "docs/subsystems/game.md",
+      "symbol": "PlaytestResult",
+      "source": "packages/game/game/src/types.ts"
+    },
+    {
+      "doc": "docs/subsystems/game.md",
+      "symbol": "GauntletScenario",
+      "source": "packages/game/game-gauntlet/src/types.ts"
+    },
+    {
+      "doc": "docs/subsystems/game.md",
+      "symbol": "GauntletRound",
+      "source": "packages/game/game-gauntlet/src/types.ts"
     }
   ]
 }
