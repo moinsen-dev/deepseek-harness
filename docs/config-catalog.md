@@ -585,6 +585,40 @@ export interface Config {
 
 Source: [`packages/e2b/e2b/src/index.ts:43`](../packages/e2b/e2b/src/index.ts)
 
+<a id="deepseek-aidsh-engine-godot"></a>
+
+## `@deepseek-ai/dsh-engine-godot`
+
+Requires: `game` · `subprocess`
+
+```ts config-catalog
+/** Plugin config: the engine executable, the grace period, and the scenarios to trace. */
+export interface Config {
+  /** Godot executable. Defaults to `godot` on PATH. */
+  godotPath?: string
+  /** Terminate-escalation grace (ms) for one engine run. Defaults to 30000. */
+  graceMs?: number
+  /** Engine scenarios to trace and register; an empty list registers nothing. */
+  scenarios?: GodotScenario[]
+}
+
+/** One engine scenario the provider turns into a registered game module. */
+export interface GodotScenario {
+  /** Stable game id the produced module registers under. */
+  readonly id: string
+  /** Godot project directory (`--path`). */
+  readonly projectDir: string
+  /** Runner script inside the project (`--script`, e.g. `res://runner.gd`). */
+  readonly runner: string
+  /** The fixed scripted input sequence the runner replays. */
+  readonly inputs: JsonValue[]
+}
+```
+
+Depends on: [`JsonValue`](../packages/core/session/src/index.ts)
+
+Source: [`packages/game/engine-godot/src/index.ts:35`](../packages/game/engine-godot/src/index.ts)
+
 <a id="deepseek-aidsh-fs-local"></a>
 
 ## `@deepseek-ai/dsh-fs-local`

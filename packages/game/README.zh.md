@@ -8,6 +8,7 @@
 |---|---|---|
 | [`game/`](game/README.md) | 定义游戏模块注册表、试玩执行与共享错误 | `ctx.game` |
 | [`game-sim/`](game-sim/README.md) | 提供内置确定性 `coin-chase` 游戏 | registers on `ctx.game` |
+| [`engine-godot/`](engine-godot/README.md) | 通过 Godot headless 为每个场景追踪一次并注册确定性重放模块 | registers on `ctx.game` |
 | [`tool-game/`](tool-game/README.md) | 向模型暴露 `game_play` 与 `game_list` | registers on `ctx.tools` |
 | [`game-gauntlet/`](game-gauntlet/README.md) | 对照质量门槛给回合打分、运行 builder/critic 循环策略并记录持久化 `gauntlet/round` 会话事件 | `ctx.gauntlet` |
 | [`tool-gauntlet/`](tool-gauntlet/README.md) | 向模型暴露 `gauntlet_round`，回合号由运行时分配 | registers on `ctx.tools` |

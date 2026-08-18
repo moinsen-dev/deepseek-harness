@@ -14,6 +14,7 @@ Phase-0 PoC 以新的 `packages/game/` 组发布，由 `examples/gamedev-agent` 
 
 - [`@deepseek-ai/dsh-game`](../../../../packages/game/game/README.md) 是 Service Definition：`ctx.game` 按稳定 id 注册确定性 `GameModule`（重复 id 大声失败），以配置的 `maxSteps` 上限执行脚本化输入序列，并把每个状态快照校验为无损 JSON、最终分数校验为有限值。接缝不依赖会话：记录什么由消费方决定。
 - [`@deepseek-ai/dsh-game-sim`](../../../../packages/game/game-sim/README.md) 是第一个提供方：`coin-chase` 3x3 确定性模拟（四种移动、三枚固定金币、每枚 10 分、全部收齐即结束）。
+- [`@deepseek-ai/dsh-engine-godot`](../../../../packages/game/engine-godot/README.md) 是引擎提供方：每个已配置场景在加载时经 Godot headless 运行一次，校验后的确定性 NDJSON 追踪以同步重放模块注册——真实引擎结果进入同一接缝，每步实时引擎执行仍待做。
 - [`@deepseek-ai/dsh-tool-game`](../../../../packages/game/tool-game/README.md) 是消费方：面向模型的 `game_play`（脚本化输入进，步数/状态/分数/终态出，带协作式超时）与 `game_list`。
 - [`@deepseek-ai/dsh-game-gauntlet`](../../../../packages/game/game-gauntlet/README.md) 拥有 gauntlet 循环原语：`ctx.gauntlet.run(scenario, session, attempt)` 经接缝游玩，仅当 `score >= bar` 时判定回合通过（模型无关），强制回合号按会话与场景严格递增，并追加 log-only 的 `gauntlet/round` 会话事件。`nextAttempt` 暴露分配的回合编号，`runLoop(session, plan)` 随包发布 builder/critic 循环策略——候选输入序列逐轮打分、最佳分数作为基线传递、在首个达标回合停止——`foldGauntletRounds` 从日志恢复循环位置。包级不变量在追加处拦截，拒绝判定与门槛关系矛盾的回合。
 - [`@deepseek-ai/dsh-tool-gauntlet`](../../../../packages/game/tool-gauntlet/README.md) 是面向模型的一半：`gauntlet_round` 提出一个候选策略，收到运行时分配的回合号与模型无关判定，因此模型按“提出 → 打分 → 提出”迭代，而无需自己指定回合号。
@@ -28,4 +29,4 @@ agent 侧的 builder/critic 迭代刻意不作为新引擎发布：它由既有�
 
 ## Consequences
 
-接缝与循环让游戏变体在不触碰 `agent-loop` 的前提下获得三项必需性质：模型通过试玩验证游戏行为（确定性、可重放）、门槛比较模型无关且被记录、循环位置经会话日志在恢复与分叉后仍可还原。代价：模块契约是同步且同进程的（引擎提供方延后）、agent 侧 builder/critic 迭代仍是示例接线而非被调度的产品功能、回合顺序为进程内状态，直到消费方通过折叠日志重新推导。
+接缝与循环让游戏变体在不触碰 `agent-loop` 的前提下获得三项必需性质：模型通过试玩验证游戏行为（确定性、可重放）、门槛比较模型无关且被记录、循环位置经会话日志在恢复与分叉后仍可还原。代价：模块契约是同步且同进程的（每步实时引擎执行待做；engine-godot 以加载期追踪桥接真实引擎）、agent 侧 builder/critic 迭代仍是示例接线而非被调度的产品功能、回合顺序为进程内状态，直到消费方通过折叠日志重新推导。

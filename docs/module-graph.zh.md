@@ -201,6 +201,7 @@ flowchart TD
     pkg_message_feedback["message-feedback"]
   end
   subgraph group_game["packages/game"]
+    pkg_engine_godot["engine-godot"]
     pkg_game["game"]
     pkg_game_gauntlet["game-gauntlet"]
     pkg_game_sim["game-sim"]
@@ -533,6 +534,10 @@ flowchart TD
   pkg_message_feedback --> pkg_session_persistence
   pkg_message_feedback --> pkg_storage_domain
   pkg_message_feedback --> pkg_typert_protocol
+  pkg_engine_godot --> pkg_game
+  pkg_engine_godot --> pkg_invariants
+  pkg_engine_godot --> pkg_session
+  pkg_engine_godot --> pkg_subprocess
   pkg_game_gauntlet --> pkg_game
   pkg_game_gauntlet --> pkg_invariants
   pkg_game_gauntlet --> pkg_llm
@@ -1526,6 +1531,7 @@ flowchart TD
 | [`spill-local`](../packages/spill/spill-local) | `spill` | [`invariants`](../packages/runtime-diagnostics/invariants), [`spill`](../packages/spill/spill) |
 | [`time-context`](../packages/context/time-context) | `context` | [`agent`](../packages/core/agent), [`invariants`](../packages/runtime-diagnostics/invariants), [`session`](../packages/core/session) |
 | [`message-feedback`](../packages/feedback/message-feedback) | `feedback` | [`brand`](../packages/util/brand), [`invariants`](../packages/runtime-diagnostics/invariants), [`llm`](../packages/llm/llm), [`session`](../packages/core/session), [`session-persistence`](../packages/session/session-persistence), [`storage-domain`](../packages/storage/storage-domain), [`typert-protocol`](../packages/typert/protocol) |
+| [`engine-godot`](../packages/game/engine-godot) | `game` | [`game`](../packages/game/game), [`invariants`](../packages/runtime-diagnostics/invariants), [`session`](../packages/core/session), [`subprocess`](../packages/subprocess/subprocess) |
 | [`game-gauntlet`](../packages/game/game-gauntlet) | `game` | [`game`](../packages/game/game), [`invariants`](../packages/runtime-diagnostics/invariants), [`llm`](../packages/llm/llm), [`session`](../packages/core/session) |
 | [`game-sim`](../packages/game/game-sim) | `game` | [`game`](../packages/game/game), [`invariants`](../packages/runtime-diagnostics/invariants) |
 | [`commands`](../packages/interaction/commands) | `interaction` | [`agent`](../packages/core/agent), [`brand`](../packages/util/brand), [`invariants`](../packages/runtime-diagnostics/invariants), [`scope`](../packages/core/scope), [`session`](../packages/core/session), [`typert-protocol`](../packages/typert/protocol) |

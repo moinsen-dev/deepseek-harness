@@ -1,6 +1,6 @@
 # Bilingual-pair consistency record (docs/i18n/README.md): the git blob hash of each
 # side as of the last confirmed-consistent state. Both languages carry equal authority;
 # after editing either side, bring the other along and re-record with:
-#   pnpm run verify-translation-pairing --write docs/module-graph.md
-module-graph.md: fd782a08dcc68915d16a2187594e4bf92f77b44e
-module-graph.zh.md: 5c8012d02f72db6f141992717665ae42bb0f22ad
+#   pnpm run verify-translation-pairing --write packages/game/engine-godot/README.md
+README.md: dfebb065e45787d187151acaf4d3822b3d649e8c
+README.zh.md: 93ac5d1efeb29875c50e7ccc5cf131258f077838
