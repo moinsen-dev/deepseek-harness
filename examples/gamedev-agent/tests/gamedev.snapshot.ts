@@ -12,13 +12,17 @@ const streamExpected = join(scenarioDir, 'stream-json.expected.jsonl')
 const loopScenarioDir = join(snapshotsDir, 'builder-critic-loop')
 const loopStreamExpected = join(loopScenarioDir, 'stream-json.expected.jsonl')
 const ralphScenarioDir = join(snapshotsDir, 'ralph-loop')
+const buildScenarioDir = join(snapshotsDir, 'builder-builds-game')
 const ralphStreamExpected = join(ralphScenarioDir, 'stream-json.expected.jsonl')
+const buildStreamExpected = join(buildScenarioDir, 'stream-json.expected.jsonl')
 const binScript = fileURLToPath(new URL('./fixtures/gauntlet-driver.ts', import.meta.url))
 const loopBinScript = fileURLToPath(new URL('./fixtures/gauntlet-loop-driver.ts', import.meta.url))
 const ralphBinScript = fileURLToPath(new URL('./fixtures/ralph-driver.ts', import.meta.url))
+const buildBinScript = fileURLToPath(new URL('./fixtures/build-driver.ts', import.meta.url))
 const configPath = fileURLToPath(new URL('./fixtures/cli.cordis.yml', import.meta.url))
 const loopConfigPath = fileURLToPath(new URL('./fixtures/cli-loop.cordis.yml', import.meta.url))
 const ralphConfigPath = fileURLToPath(new URL('./fixtures/ralph.cordis.yml', import.meta.url))
+const buildConfigPath = fileURLToPath(new URL('./fixtures/build.cordis.yml', import.meta.url))
 const tsconfigPath = fileURLToPath(new URL('../../../tsconfig.json', import.meta.url))
 const refreshing = process.env.DSH_SNAPSHOT === 'refresh'
 
@@ -140,5 +144,31 @@ describe('gamedev-agent keyless snapshot', () => {
       await writeFile(ralphStreamExpected, normalized)
     }
     expect(normalized).toBe(await readFile(ralphStreamExpected, 'utf8'))
+  }, LOADER_SMOKE_TEST_TIMEOUT_MS)
+
+  it('pins the authoring loop — build a new game, play it, report', async () => {
+    let runCwd = ''
+    const result = await runLoaderSmoke({
+      label: 'gamedev-agent build stream-json snapshot',
+      tempDirPrefix: 'gamedev-agent-build-snapshot-',
+      binScript: buildBinScript,
+      libBinScript: buildBinScript,
+      configPath: buildConfigPath,
+      binArgs: [buildConfigPath, 'build a small counter game and play it'],
+      tsconfigPath,
+      env: {
+        DSH_SNAPSHOT: 'replay',
+        NODE_OPTIONS: [process.env.NODE_OPTIONS, '--disable-warning=ExperimentalWarning'].filter(Boolean).join(' '),
+      },
+      prepare: (cwd) => { runCwd = cwd },
+    })
+
+    expect(result.stderr).toBe('')
+    const normalized = normalizeHeadlessStream(result.stdout, runCwd)
+    if (refreshing) {
+      await mkdir(buildScenarioDir, { recursive: true })
+      await writeFile(buildStreamExpected, normalized)
+    }
+    expect(normalized).toBe(await readFile(buildStreamExpected, 'utf8'))
   }, LOADER_SMOKE_TEST_TIMEOUT_MS)
 })

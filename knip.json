@@ -37,7 +37,9 @@
       "entry": [
         "gamedev-agent/tests/fixtures/gamedev-mock-llm.ts",
         "gamedev-agent/tests/fixtures/gamedev-loop-mock-llm.ts",
+        "gamedev-agent/tests/fixtures/gamedev-build-mock-llm.ts",
         "gamedev-agent/tests/fixtures/gamedev-ralph-mock-llm.ts",
+        "gamedev-agent/tests/fixtures/build-driver.ts",
         "gamedev-agent/tests/fixtures/gauntlet-driver.ts",
         "gamedev-agent/tests/fixtures/gauntlet-loop-driver.ts",
         "gamedev-agent/tests/fixtures/ralph-driver.ts",

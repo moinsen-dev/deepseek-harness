@@ -65,6 +65,7 @@ import * as GameSim from '@deepseek-ai/dsh-game-sim'
 import * as ToolGame from '@deepseek-ai/dsh-tool-game'
 import GauntletRuntime from '@deepseek-ai/dsh-game-gauntlet'
 import * as ToolGauntlet from '@deepseek-ai/dsh-tool-gauntlet'
+import * as ToolGameBuild from '@deepseek-ai/dsh-tool-game-build'
 import VmWorkflowEngine from '@deepseek-ai/dsh-workflow-worker-thread'
 import * as ToolRalph from '@deepseek-ai/dsh-tool-ralph'
 import * as ToolWorkflow from '@deepseek-ai/dsh-tool-workflow'
@@ -589,6 +590,21 @@ const TOOL_PACKAGES: ToolPackage[] = [
     },
     note:
       'gauntlet_round keeps scoring behind ctx.gauntlet so model-visible schemas stay stable across game providers.',
+  },
+  {
+    pkg: '@deepseek-ai/dsh-tool-game-build',
+    dir: 'tool-game-build',
+    source: 'packages/game/tool-game-build/src/index.ts',
+    requires: ['ctx.tools', 'ctx.game'],
+    writes: ['tool/call', 'tool/result'],
+    async mount(ctx) {
+      // Mount the seam so both authoring tools register; their schemas do not
+      // depend on which games exist.
+      await ctx.plugin(GameRuntime)
+      await ctx.plugin(ToolGameBuild)
+    },
+    note:
+      'game_build and game_remove keep registration behind ctx.game so model-visible schemas stay stable across game providers.',
   },
 ]
 

@@ -43,6 +43,7 @@
 | `@deepseek-ai/dsh-tool-web` | `web_fetch`、`web_search` | `ctx.tools`、`ctx.web`、`ctx.systemPrompt` | `tool/call`、`tool/result` | - | web_search 和 web_fetch 将提供方选择置于 ctx.web 之后，使模型可见 schema 在更换后端时保持稳定。 |
 | `@deepseek-ai/dsh-tool-game` | `game_list`、`game_play` | `ctx.tools`、`ctx.game` | `tool/call`、`tool/result` | - | game_play 和 game_list 将游戏选择置于 ctx.game 之后，使模型可见 schema 在更换提供方时保持稳定。 |
 | `@deepseek-ai/dsh-tool-gauntlet` | `gauntlet_round` | `ctx.tools`、`ctx.gauntlet` | `tool/call`、`gauntlet/round`、`tool/result` | - | gauntlet_round 将打分置于 ctx.gauntlet 之后，使模型可见 schema 在更换游戏提供方时保持稳定。 |
+| `@deepseek-ai/dsh-tool-game-build` | `game_build`、`game_remove` | `ctx.tools`、`ctx.game` | `tool/call`、`tool/result` | - | game_build 和 game_remove 将注册置于 ctx.game 之后，使模型可见 schema 在更换游戏提供方时保持稳定。 |
 
 <a id="deepseek-aidsh-tool-ask-user"></a>
 
@@ -1975,3 +1976,55 @@ game_play 和 game_list 将游戏选择置于 ctx.game 之后，使模型可见 
 来源：[`packages/game/tool-gauntlet/src/index.ts`](../packages/game/tool-gauntlet/src/index.ts)
 
 gauntlet_round 将打分置于 ctx.gauntlet 之后，使模型可见 schema 在更换游戏提供方时保持稳定。
+
+<a id="deepseek-aidsh-tool-game-build"></a>
+
+## `@deepseek-ai/dsh-tool-game-build`
+
+### `game_build`
+
+从纯 JavaScript 源码构建新游戏并实时注册：源码必须把 module.exports.create 设为返回 { step(input), state(), done(), score() } 的工厂。工具在沙箱中编译它，通过把探针输入游玩两次来证明确定性（两次运行必须在每个输入后完全一致），并报告探针结果。重建已有 id 会替换上一次构建。
+```json
+{
+  "type": "object",
+  "properties": {
+    "id": {
+      "type": "string",
+      "description": "Stable game id for the new game; rebuilding it replaces the previous build."
+    },
+    "source": {
+      "type": "string",
+      "description": "Plain JavaScript module body setting module.exports.create; no TypeScript annotations."
+    }
+  },
+  "required": [
+    "id",
+    "source"
+  ]
+}
+```
+
+来源：[`packages/game/tool-game-build/src/index.ts`](../packages/game/tool-game-build/src/index.ts)
+
+### `game_remove`
+
+卸载由 game_build 注册的游戏。内置游戏与其他提供方的游戏不可移除。
+
+```json
+{
+  "type": "object",
+  "properties": {
+    "id": {
+      "type": "string",
+      "description": "Stable game id of a game this session built with game_build."
+    }
+  },
+  "required": [
+    "id"
+  ]
+}
+```
+
+来源：[`packages/game/tool-game-build/src/index.ts`](../packages/game/tool-game-build/src/index.ts)
+
+game_build 和 game_remove 将注册置于 ctx.game 之后，使模型可见 schema 在更换游戏提供方时保持稳定。

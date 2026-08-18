@@ -2497,6 +2497,24 @@ export interface Config {
 
 Source: [`packages/game/tool-game/src/index.ts:31`](../packages/game/tool-game/src/index.ts)
 
+<a id="deepseek-aidsh-tool-game-build"></a>
+
+## `@deepseek-ai/dsh-tool-game-build`
+
+Requires: `tools` · `game`
+
+```ts config-catalog
+/** Plugin config: tool enablement and the determinism probe sequence. */
+export interface Config {
+  /** Register `game_build` and `game_remove`. Defaults to true. */
+  enabled?: boolean
+  /** Scripted inputs the determinism probe plays twice. Defaults to the four moves. */
+  probe?: string[]
+}
+```
+
+Source: [`packages/game/tool-game-build/src/index.ts:29`](../packages/game/tool-game-build/src/index.ts)
+
 <a id="deepseek-aidsh-tool-gauntlet"></a>
 
 ## `@deepseek-ai/dsh-tool-gauntlet`

@@ -493,7 +493,7 @@ const SERVICE_ROLES: ServiceRole[] = [
     title: 'Deterministic game-module registry and playtest execution',
     mode: 'seam',
     implementations: ['game-sim', 'engine-godot'],
-    consumers: ['tool-game', 'game-gauntlet'],
+    consumers: ['tool-game', 'game-gauntlet', 'tool-game-build'],
     note: 'Game modules register by stable id and play scripted inputs with per-run state and score validation; the seam is session-free. engine-godot replays deterministic engine traces; game-sim ships built-in simulations.',
   },
   {
