@@ -1,5 +1,6 @@
-# Patch overlay for `dsh web`: inserts the game capability plus the Ralph loop
-# stack into the booted tree. Every row stays patchable; load order resolves
+# Patch overlay for `dsh web`: inserts the game capability into the booted
+# tree. The subagent/workflow/ralph stack already ships in the web profile, so
+# only the game rows are new. Every row stays patchable; load order resolves
 # through service injection.
 - insert:
     - id: game
@@ -16,11 +17,3 @@
       name: '@deepseek-ai/dsh-game-gauntlet'
     - id: tool-gauntlet
       name: '@deepseek-ai/dsh-tool-gauntlet'
-    - id: subagent
-      name: '@deepseek-ai/dsh-subagent'
-    - id: subagent-spawn
-      name: '@deepseek-ai/dsh-subagent-spawn-in-process'
-    - id: workflow
-      name: '@deepseek-ai/dsh-workflow-worker-thread'
-    - id: tool-ralph
-      name: '@deepseek-ai/dsh-tool-ralph'
